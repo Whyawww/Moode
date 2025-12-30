@@ -1,4 +1,5 @@
 import AmbientMixer from "@/components/features/audio/AmbientMixer";
+import TaskList from "@/components/features/tasks/TaskList";
 
 export default function DashboardPage() {
   return (
@@ -15,6 +16,9 @@ export default function DashboardPage() {
 
       <div className="grid gap-6 md:grid-cols-1 max-w-md mx-auto">
         <AmbientMixer />
+      </div>
+      <div className="h-full">
+        <TaskList />
       </div>
     </div>
   );
