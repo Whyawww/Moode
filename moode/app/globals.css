@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+}
+
+:root {
+  /* Default Theme: Deep Focus */
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --primary: #38bdf8;
+  --surface: #1e293b;
+  --muted: #94a3b8;
+}
+
+/* Theme: Zen Garden */
+[data-theme="zen"] {
+  --background: #1a2e1e;
+  --foreground: #f0fdf4;
+  --primary: #4ade80;
+  --surface: #26412b;
+  --muted: #86efac;
+}
+
+/* Theme: Sunset Lofi */
+[data-theme="sunset"] {
+  --background: #2e1065;
+  --foreground: #fae8ff;
+  --primary: #f472b6;
+  --surface: #4c1d95;
+  --muted: #d8b4fe;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 500ms;
+}
