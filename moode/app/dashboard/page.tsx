@@ -1,7 +1,10 @@
+import AmbientMixer from "@/components/features/audio/AmbientMixer";
+
 export default function DashboardPage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="text-center space-y-2">
+      {/* Hero Section */}
+      <div className="text-center space-y-2 pt-8">
         <h1 className="text-4xl font-bold tracking-tight text-foreground">
           Ready to flow?
         </h1>
@@ -10,8 +13,8 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <div className="p-10 border border-dashed border-white/10 rounded-3xl text-center bg-surface/20 text-muted">
-        <p>🎵 Ambient Mixer will be here</p>
+      <div className="grid gap-6 md:grid-cols-1 max-w-md mx-auto">
+        <AmbientMixer />
       </div>
     </div>
   );
