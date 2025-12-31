@@ -10,60 +10,91 @@ export default function FocusPage() {
   const { tasks } = useStore();
   const router = useRouter();
 
-  // Default 25 menit
   const [initialTime, setInitialTime] = useState(25 * 60);
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
-  const [isEditing, setIsEditing] = useState(false); // Mode edit manual
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Ref buat auto-focus ke input pas tombol Custom diklik
+  const endTimeRef = useRef<number | null>(null);
+
   const inputRef = useRef<HTMLInputElement>(null);
-
   const currentTask = tasks.find((t) => !t.completed) || tasks[0];
 
-  // Logic Timer Jalan
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }, []);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    if (isActive && timeLeft > 0) {
+    if (isActive) {
+      if (!endTimeRef.current) {
+        endTimeRef.current = Date.now() + timeLeft * 1000;
+      }
+
       interval = setInterval(() => {
-        setTimeLeft((time) => time - 1);
-      }, 1000);
-    } else if (timeLeft === 0) {
-      setIsActive(false);
-      alert("Session Finished! Good job.");
+        const now = Date.now();
+        const remaining = Math.ceil((endTimeRef.current! - now) / 1000);
+
+        if (remaining <= 0) {
+          setTimeLeft(0);
+          setIsActive(false);
+          endTimeRef.current = null;
+          handleComplete();
+        } else {
+          setTimeLeft(remaining);
+        }
+      }, 200);
+    } else {
+      endTimeRef.current = null;
     }
 
     return () => clearInterval(interval);
-  }, [isActive, timeLeft]);
+  }, [isActive]);
 
-  // Auto focus ke input pas mode editing nyala
   useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
+    const formatted = formatTime(timeLeft);
+    if (isActive) {
+      document.title = `(${formatted}) ${
+        currentTask?.title || "Focus"
+      } - Moode`;
+    } else {
+      document.title = "Moode - Focus Room";
     }
-  }, [isEditing]);
+  }, [timeLeft, isActive, currentTask]);
 
-  // Handle Pilih Preset
+  const handleComplete = () => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Time's Up! 🎉", {
+        body: `You finished: ${currentTask?.title}`,
+        icon: "/favicon.ico",
+      });
+    }
+
+    const audio = new Audio("/notification.mp3");
+
+    alert("Session Finished! Good job.");
+  };
+
   const handleDurationChange = (minutes: number) => {
     const seconds = minutes * 60;
     setInitialTime(seconds);
     setTimeLeft(seconds);
     setIsActive(false);
     setIsEditing(false);
+    endTimeRef.current = null;
   };
 
-  // Handle Input Manual (Custom)
   const handleManualInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Izinkan input kosong biar user bisa hapus angka
     if (e.target.value === "") return;
-
     const val = parseInt(e.target.value);
     if (!isNaN(val) && val > 0 && val <= 180) {
-      // Limit 3 jam (180 menit)
       const seconds = val * 60;
       setInitialTime(seconds);
       setTimeLeft(seconds);
+      endTimeRef.current = null;
     }
   };
 
@@ -98,7 +129,6 @@ export default function FocusPage() {
           </h1>
         </div>
 
-        {/* --- THE TIMER AREA --- */}
         <div className="relative group min-h-[160px] flex items-center justify-center">
           <div
             className={`font-mono font-bold tracking-tighter text-foreground tabular-nums transition-all ${
@@ -163,7 +193,6 @@ export default function FocusPage() {
           </p>
         )}
 
-        {/* --- CONTROLS --- */}
         <div className="flex items-center justify-center gap-6 pt-4">
           <button
             onClick={() => {
@@ -184,6 +213,7 @@ export default function FocusPage() {
               setIsActive(false);
               setIsEditing(false);
               setTimeLeft(initialTime);
+              endTimeRef.current = null;
             }}
             className="p-6 rounded-full bg-surface hover:bg-surface/80 text-foreground transition-all"
             title="Reset Timer"
@@ -192,7 +222,6 @@ export default function FocusPage() {
           </button>
         </div>
 
-        {/* Mini Mixer */}
         <div className="pt-8 w-full max-w-sm mx-auto">
           <div className="opacity-50 hover:opacity-100 transition-opacity duration-300">
             <AmbientMixer />
