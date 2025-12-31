@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, CloudRain, Clock, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -34,7 +35,15 @@ export default function LandingPage() {
 
       <nav className="absolute top-0 w-full p-6 flex justify-between items-center z-20">
         <div className="text-xl font-bold tracking-tight flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-primary" />
+          <div className="relative w-8 h-8">
+            <Image
+              src="/logo.png"
+              alt="Moode Logo"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
           Moode.
         </div>
         <Link
@@ -63,7 +72,7 @@ export default function LandingPage() {
           </h1>
           <p className="text-lg md:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
             A minimalist workspace that combines ambient sounds, a strict
-            rule-of-3 task list, and a flow-state timer. Designed for students
+            rule-of-7 task list, and a flow-state timer. Designed for students
             who need to lock in.
           </p>
         </motion.div>
@@ -95,8 +104,8 @@ export default function LandingPage() {
           />
           <FeatureCard
             icon={<CheckCircle2 size={24} />}
-            title="The Rule of 3"
-            desc="Only 3 tasks allowed at once. Stop being overwhelmed, start doing."
+            title="The Rule of 7"
+            desc="Only 7 tasks allowed at once. Stop being overwhelmed, start doing."
           />
           <FeatureCard
             icon={<Clock size={24} />}
@@ -108,7 +117,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="absolute bottom-6 text-xs text-muted/50">
-        © 2025 Moode. Built for Amikom Students.
+        © 2025 Moode by Wahyu Aji Nusantara.
       </footer>
     </div>
   );
