@@ -3,7 +3,14 @@
 import { useEffect, useState, useRef } from "react";
 import { useStore } from "@/hooks/useStore";
 import { useRouter } from "next/navigation";
-import { Pause, Play, Square, ArrowLeft, Pencil } from "lucide-react";
+import {
+  Pause,
+  Play,
+  RotateCcw,
+  ArrowLeft,
+  Pencil,
+  CheckCircle,
+} from "lucide-react";
 import AmbientMixer from "@/components/features/audio/AmbientMixer";
 import SessionCompleteModal from "@/components/features/timer/SessionCompleteModal";
 
@@ -72,8 +79,27 @@ export default function FocusPage() {
         body: `You finished: ${currentTask?.title}`,
       });
     }
-
     setShowModal(true);
+  };
+
+  const handleFinishEarly = () => {
+    setIsActive(false);
+    endTimeRef.current = null;
+    handleComplete();
+  };
+
+  const handleReset = () => {
+    if (timeLeft === initialTime) return;
+
+    const confirmReset = window.confirm(
+      "Are you sure you want to reset the timer? Current progress will be lost."
+    );
+    if (confirmReset) {
+      setIsActive(false);
+      setIsEditing(false);
+      setTimeLeft(initialTime);
+      endTimeRef.current = null;
+    }
   };
 
   const handleDurationChange = (minutes: number) => {
@@ -111,17 +137,16 @@ export default function FocusPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative p-6 transition-colors duration-500 overflow-hidden">
       <button
-        onClick={() => router.push("/dashboard")}
+        onClick={() => router.push("/")}
         className="absolute top-6 left-6 p-2 rounded-full bg-surface/20 hover:bg-surface/40 text-muted transition-all z-20"
       >
         <ArrowLeft size={24} />
       </button>
 
-      {/* 4. RENDER MODAL DISINI */}
       <SessionCompleteModal
         isOpen={showModal}
         taskTitle={currentTask.title}
-        durationMinutes={Math.floor(initialTime / 60)}
+        durationMinutes={Math.ceil((initialTime - timeLeft) / 60)}
         taskId={currentTask.id}
       />
 
@@ -135,8 +160,7 @@ export default function FocusPage() {
           </h1>
         </div>
 
-        {/* ... Timer Area & Controls (Copy logic timer yang sama dari sebelumnya) ... */}
-        {/* Biar ga kepanjangan, bagian Timer UI sama persis kaya sebelumnya ya bro */}
+        {/* Timer Display */}
         <div className="relative group min-h-[160px] flex items-center justify-center">
           <div
             className={`font-mono font-bold tracking-tighter text-foreground tabular-nums transition-all ${
@@ -169,6 +193,7 @@ export default function FocusPage() {
           </div>
         </div>
 
+        {/* Presets */}
         {!isActive && !isEditing && (
           <div className="flex flex-wrap justify-center gap-2 animate-in fade-in slide-in-from-top-2">
             {[15, 25, 45, 60].map((min) => (
@@ -201,32 +226,38 @@ export default function FocusPage() {
           </p>
         )}
 
-        <div className="flex items-center justify-center gap-6 pt-4">
+        <div className="flex items-center justify-center gap-8 pt-6">
+          {/* RESET BUTTON */}
+          <button
+            onClick={handleReset}
+            className="p-4 rounded-full bg-surface text-muted hover:bg-red-500/10 hover:text-red-400 hover:scale-105 transition-all"
+            title="Reset Timer"
+          >
+            <RotateCcw size={22} />
+          </button>
+
+          {/* PLAY/PAUSE */}
           <button
             onClick={() => {
               if (isEditing) setIsEditing(false);
               setIsActive(!isActive);
             }}
-            className="p-6 rounded-full bg-primary text-background hover:scale-110 hover:shadow-xl hover:shadow-primary/30 active:scale-95 transition-all"
+            className="p-7 rounded-full bg-primary text-background hover:scale-110 hover:shadow-xl hover:shadow-primary/30 active:scale-95 transition-all"
           >
             {isActive ? (
-              <Pause size={32} fill="currentColor" />
+              <Pause size={36} fill="currentColor" />
             ) : (
-              <Play size={32} fill="currentColor" />
+              <Play size={36} fill="currentColor" />
             )}
           </button>
 
+          {/* FINISH EARLY */}
           <button
-            onClick={() => {
-              setIsActive(false);
-              setIsEditing(false);
-              setTimeLeft(initialTime);
-              endTimeRef.current = null;
-            }}
-            className="p-6 rounded-full bg-surface hover:bg-surface/80 text-foreground transition-all"
-            title="Reset Timer"
+            onClick={handleFinishEarly}
+            className="p-4 rounded-full bg-surface text-muted hover:bg-green-500/10 hover:text-green-400 hover:scale-105 transition-all"
+            title="Finish Task Now"
           >
-            <Square size={24} />
+            <CheckCircle size={22} />
           </button>
         </div>
 
