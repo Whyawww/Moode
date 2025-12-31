@@ -24,7 +24,7 @@ interface AppState {
   volumes: AudioState;
   setVolume: (type: keyof AudioState, value: number) => void;
 
-  // --- Task Slice (BARU) ---
+  // --- Task Slice ---
   tasks: Task[];
   addTask: (title: string) => void;
   removeTask: (id: string) => void;
@@ -46,7 +46,7 @@ export const useStore = create<AppState>()(
       tasks: [],
       addTask: (title) =>
         set((state) => {
-          if (state.tasks.length >= 5) return state;
+          if (state.tasks.length >= 7) return state;
           return {
             tasks: [
               ...state.tasks,

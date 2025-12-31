@@ -5,6 +5,7 @@ import { useStore } from "@/hooks/useStore";
 import { useRouter } from "next/navigation";
 import { Pause, Play, Square, ArrowLeft, Pencil } from "lucide-react";
 import AmbientMixer from "@/components/features/audio/AmbientMixer";
+import SessionCompleteModal from "@/components/features/timer/SessionCompleteModal";
 
 export default function FocusPage() {
   const { tasks } = useStore();
@@ -14,9 +15,9 @@ export default function FocusPage() {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const endTimeRef = useRef<number | null>(null);
-
   const inputRef = useRef<HTMLInputElement>(null);
   const currentTask = tasks.find((t) => !t.completed) || tasks[0];
 
@@ -69,13 +70,10 @@ export default function FocusPage() {
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification("Time's Up! 🎉", {
         body: `You finished: ${currentTask?.title}`,
-        icon: "/favicon.ico",
       });
     }
 
-    const audio = new Audio("/notification.mp3");
-
-    alert("Session Finished! Good job.");
+    setShowModal(true);
   };
 
   const handleDurationChange = (minutes: number) => {
@@ -119,6 +117,14 @@ export default function FocusPage() {
         <ArrowLeft size={24} />
       </button>
 
+      {/* 4. RENDER MODAL DISINI */}
+      <SessionCompleteModal
+        isOpen={showModal}
+        taskTitle={currentTask.title}
+        durationMinutes={Math.floor(initialTime / 60)}
+        taskId={currentTask.id}
+      />
+
       <div className="max-w-md w-full text-center space-y-8 z-10">
         <div className="space-y-4 animate-in fade-in zoom-in duration-500">
           <span className="text-primary text-xs font-bold tracking-[0.2em] uppercase bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
@@ -129,6 +135,8 @@ export default function FocusPage() {
           </h1>
         </div>
 
+        {/* ... Timer Area & Controls (Copy logic timer yang sama dari sebelumnya) ... */}
+        {/* Biar ga kepanjangan, bagian Timer UI sama persis kaya sebelumnya ya bro */}
         <div className="relative group min-h-[160px] flex items-center justify-center">
           <div
             className={`font-mono font-bold tracking-tighter text-foreground tabular-nums transition-all ${

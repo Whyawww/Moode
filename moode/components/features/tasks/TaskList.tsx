@@ -13,16 +13,15 @@ export default function TaskList() {
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim() || tasks.length >= 5) return;
+    if (!inputValue.trim() || tasks.length >= 7) return;
     addTask(inputValue);
     setInputValue("");
   };
 
-  const isFull = tasks.length >= 5;
+  const isFull = tasks.length >= 7;
 
   return (
     <div className="w-full backdrop-blur-xl bg-surface/40 border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col h-full min-h-[320px]">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold tracking-tight text-foreground">
           Your Focus
@@ -34,11 +33,10 @@ export default function TaskList() {
               : "bg-white/10 text-muted border-white/10"
           }`}
         >
-          {tasks.length}/5 Tasks
+          {tasks.length}/7 Tasks
         </span>
       </div>
 
-      {/* Input Form */}
       <form onSubmit={handleAdd} className="relative mb-6">
         <input
           type="text"
@@ -59,7 +57,7 @@ export default function TaskList() {
         </button>
       </form>
 
-      {/* Task Items (Animated) */}
+      {/* Task Items */}
       <div className="flex-1 space-y-3 overflow-y-auto">
         <AnimatePresence mode="popLayout">
           {tasks.length === 0 && (
