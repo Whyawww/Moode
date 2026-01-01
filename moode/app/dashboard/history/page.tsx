@@ -28,15 +28,63 @@ export default function HistoryPage() {
   });
 
   const css = `
-    .rdp { margin: 0; }
-    .rdp-month { background-color: transparent; }
-    .rdp-day_selected:not([disabled]) { background-color: var(--primary); color: var(--background); font-weight: bold; }
-    .rdp-day_today { color: var(--primary); font-weight: bold; }
-    .rdp-button:hover:not([disabled]):not(.rdp-day_selected) { background-color: var(--surface); }
+    .rdp { 
+        margin: 0; 
+        --rdp-cell-size: 45px; 
+    }
+    .rdp-month { 
+        background-color: transparent; 
+    }
+    .rdp-caption_label {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--foreground);
+    }
+    .rdp-nav_button {
+        color: var(--muted);
+        border-radius: 10px;
+    }
+    .rdp-nav_button:hover {
+        color: var(--foreground);
+        background-color: var(--surface);
+    }
+    
+    .rdp-day {
+        color: var(--foreground);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border-radius: 12px;
+    }
+    .rdp-day:hover:not([disabled]) { 
+        background-color: var(--surface); 
+        color: var(--primary);
+    }
+
+    .rdp-day_today { 
+        color: var(--primary); 
+        font-weight: 900;
+        border: 1px solid var(--primary);
+        background-color: transparent;
+    }
+
+    .rdp-day_selected:not([disabled]), 
+    .rdp-day_selected:focus:not([disabled]), 
+    .rdp-day_selected:active:not([disabled]), 
+    .rdp-day_selected:hover:not([disabled]) { 
+        background-color: var(--primary) !important; 
+        color: var(--background) !important;
+        font-weight: bold !important;
+        
+        border-radius: 100% !important; 
+        
+        box-shadow: 0 0 15px var(--primary); 
+        transform: scale(1.1);
+        border: 2px solid var(--background);
+    }
   `;
 
   return (
-    <div className="min-h-screen p-6 pt-24 max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="min-h-screen p-6 pt-24 max-w-4xl mx-auto space-y-8">
       <style>{css}</style>
 
       {/* Header */}
@@ -65,16 +113,12 @@ export default function HistoryPage() {
               modifiersClassNames={{
                 selected: "my-selected",
               }}
-              styles={{
-                caption: { color: "var(--foreground)" },
-                head_cell: { color: "var(--muted)" },
-                day: { color: "var(--foreground)" },
-              }}
+              // Hapus styles inline disini biar gak bentrok sama CSS string di atas
             />
           </div>
         </div>
 
-        {/*LIST TASK */}
+        {/* LIST TASK */}
         <div className="space-y-4 w-full">
           <h2 className="text-xl font-semibold text-foreground border-b border-white/10 pb-4 flex justify-between items-center">
             <span>

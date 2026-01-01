@@ -56,7 +56,7 @@ export default function TaskList() {
           placeholder={
             isFull
               ? "Finish a task to add more..."
-              : "Type the task you want to complete..."
+              : "Type the task you want to complete"
           }
           disabled={isFull}
           className="w-full bg-surface/50 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
@@ -143,7 +143,7 @@ function TaskItem({
   remove,
 }: {
   task: Task;
-  toggle: (id: string) => void;
+  toggle: (id: string, status: boolean) => void;
   remove: (id: string) => void;
 }) {
   return (
@@ -160,7 +160,7 @@ function TaskItem({
     >
       <div className="flex items-center gap-3 overflow-hidden">
         <button
-          onClick={() => toggle(task.id)}
+          onClick={() => toggle(task.id, task.completed)}
           className={`flex-shrink-0 transition-colors ${
             task.completed ? "text-primary" : "text-muted hover:text-primary"
           }`}

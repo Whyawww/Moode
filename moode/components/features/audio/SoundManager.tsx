@@ -29,13 +29,12 @@ export default function SoundManager() {
         volume: 0,
         preload: true,
         html5: false,
-        onloaderror: (id, err) => {
-          console.error(`❌ Gagal load audio: ${key}`, err);
-        },
+        onloaderror: (id, err) =>
+          console.error(`❌ Gagal load audio: ${key}`, err),
         onplayerror: (id, err) => {
-          sounds.current[key]?.once("unlock", () => {
-            sounds.current[key]?.play();
-          });
+          sounds.current[key]?.once("unlock", () =>
+            sounds.current[key]?.play()
+          );
         },
       });
     });
@@ -43,9 +42,7 @@ export default function SoundManager() {
     Object.values(sounds.current).forEach((sound) => sound?.play());
 
     const unlockAudio = () => {
-      if (Howler.ctx.state === "suspended") {
-        Howler.ctx.resume();
-      }
+      if (Howler.ctx.state === "suspended") Howler.ctx.resume();
     };
     document.addEventListener("click", unlockAudio);
     document.addEventListener("keydown", unlockAudio);
@@ -58,18 +55,18 @@ export default function SoundManager() {
   }, []);
 
   useEffect(() => {
-    const isLandingPage = pathname === "/";
+    const shouldMute = pathname === "/" || pathname === "/auth/login";
 
-    Howler.mute(isLandingPage);
+    Howler.mute(shouldMute);
 
     if (sounds.current.rain) {
-      sounds.current.rain.volume(isLandingPage ? 0 : volumes.rain);
+      sounds.current.rain.volume(shouldMute ? 0 : volumes.rain);
     }
     if (sounds.current.cafe) {
-      sounds.current.cafe.volume(isLandingPage ? 0 : volumes.cafe);
+      sounds.current.cafe.volume(shouldMute ? 0 : volumes.cafe);
     }
     if (sounds.current.fire) {
-      sounds.current.fire.volume(isLandingPage ? 0 : volumes.fire);
+      sounds.current.fire.volume(shouldMute ? 0 : volumes.fire);
     }
   }, [volumes, pathname]);
 
