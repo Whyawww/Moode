@@ -16,15 +16,10 @@ export interface Task {
 }
 
 interface AppState {
-  // --- Theme Slice ---
   theme: ThemeType;
   setTheme: (theme: ThemeType) => void;
-
-  // --- Audio Slice ---
   volumes: AudioState;
   setVolume: (type: keyof AudioState, value: number) => void;
-
-  // --- Task Slice ---
   tasks: Task[];
   addTask: (title: string) => void;
   removeTask: (id: string) => void;
@@ -46,11 +41,13 @@ export const useStore = create<AppState>()(
       tasks: [],
       addTask: (title) =>
         set((state) => {
-          if (state.tasks.length >= 7) return state;
+          const activeCount = state.tasks.filter((t) => !t.completed).length;
+          if (activeCount >= 7) return state;
+
           return {
             tasks: [
-              ...state.tasks,
               { id: crypto.randomUUID(), title, completed: false },
+              ...state.tasks,
             ],
           };
         }),

@@ -137,7 +137,7 @@ export default function FocusPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative p-6 transition-colors duration-500 overflow-hidden">
       <button
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/dashboard")}
         className="absolute top-6 left-6 p-2 rounded-full bg-surface/20 hover:bg-surface/40 text-muted transition-all z-20"
       >
         <ArrowLeft size={24} />
@@ -146,7 +146,7 @@ export default function FocusPage() {
       <SessionCompleteModal
         isOpen={showModal}
         taskTitle={currentTask.title}
-        durationMinutes={Math.ceil((initialTime - timeLeft) / 60)}
+        durationSeconds={Math.max(0, initialTime - timeLeft)}
         taskId={currentTask.id}
       />
 

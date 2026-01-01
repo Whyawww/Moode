@@ -8,14 +8,14 @@ import { useStore } from "@/hooks/useStore";
 interface SessionCompleteModalProps {
   isOpen: boolean;
   taskTitle: string;
-  durationMinutes: number;
+  durationSeconds: number;
   taskId: string;
 }
 
 export default function SessionCompleteModal({
   isOpen,
   taskTitle,
-  durationMinutes,
+  durationSeconds,
   taskId,
 }: SessionCompleteModalProps) {
   const router = useRouter();
@@ -24,6 +24,15 @@ export default function SessionCompleteModal({
   const handleFinish = () => {
     toggleTask(taskId);
     router.push("/dashboard");
+  };
+
+  const formatDurationText = (totalSeconds: number) => {
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+
+    if (m > 0 && s > 0) return `${m} minutes ${s} seconds`;
+    if (m > 0) return `${m} minute${m > 1 ? "s" : ""}`;
+    return `${s} second${s !== 1 ? "s" : ""}`;
   };
 
   return (
@@ -57,7 +66,7 @@ export default function SessionCompleteModal({
                 <p className="text-muted">
                   You focused for{" "}
                   <span className="text-primary font-bold">
-                    {durationMinutes} minutes
+                    {formatDurationText(durationSeconds)}
                   </span>{" "}
                   on:
                 </p>
