@@ -1,7 +1,8 @@
 "use client";
 
 import { useStore } from "@/hooks/useStore";
-import { Monitor, Leaf, Sunset } from "lucide-react";
+import { Monitor, Leaf, Sunset, History } from "lucide-react";
+import Link from "next/link";
 
 export default function DashboardLayout({
   children,
@@ -21,6 +22,13 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex gap-2">
+            <Link
+              href="/dashboard/history"
+              className="p-2 rounded-full text-muted hover:bg-white/10 hover:text-foreground transition-all"
+              title="History"
+            >
+              <History size={18} />
+            </Link>
             <button
               onClick={() => setTheme("focus")}
               className={`p-2 rounded-full transition-all ${

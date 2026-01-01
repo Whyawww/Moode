@@ -13,6 +13,7 @@ export interface Task {
   id: string;
   title: string;
   completed: boolean;
+  completedAt?: number;
 }
 
 interface AppState {
@@ -43,7 +44,6 @@ export const useStore = create<AppState>()(
         set((state) => {
           const activeCount = state.tasks.filter((t) => !t.completed).length;
           if (activeCount >= 7) return state;
-
           return {
             tasks: [
               { id: crypto.randomUUID(), title, completed: false },
@@ -58,7 +58,13 @@ export const useStore = create<AppState>()(
       toggleTask: (id) =>
         set((state) => ({
           tasks: state.tasks.map((t) =>
-            t.id === id ? { ...t, completed: !t.completed } : t
+            t.id === id
+              ? {
+                  ...t,
+                  completed: !t.completed,
+                  completedAt: !t.completed ? Date.now() : undefined,
+                }
+              : t
           ),
         })),
     }),
