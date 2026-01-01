@@ -47,7 +47,7 @@ export default function LandingPage() {
           Moode.
         </div>
         <Link
-          href="/dashboard"
+          href="/auth/login"
           className="text-sm font-medium text-muted hover:text-foreground transition-colors"
         >
           Login
