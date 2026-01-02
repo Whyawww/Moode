@@ -1,23 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import ThemeProvider from "@/components/providers/ThemeProvider";
-import SoundManager from "@/components/features/audio/SoundManager";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: {
-    template: "Moode | %s ",
-    default: "Moode | Aesthetic Focus Tool",
-  },
-  description:
-    "Productivity reimagined for students. Mix sounds, set tasks, and flow.",
-  icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
-  },
+  title: "Moode",
+  description: "Focus shouldn't be boring.",
 };
 
 export default function RootLayout({
@@ -26,13 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <ThemeProvider>
-          <SoundManager />
-          {children}
-        </ThemeProvider>
-      </body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} antialiased`}>{children}</body>
     </html>
   );
 }

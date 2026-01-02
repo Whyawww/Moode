@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "History",
+  title: "Moode | History",
 
   description:
     "Track your productivity streaks and review completed tasks over time.",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     follow: false,
   },
   openGraph: {
-    title: "Moode - History",
+    title: "Moode | History",
     description: "Check out my productivity journey.",
     type: "website",
   },
