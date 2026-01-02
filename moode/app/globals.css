@@ -67,6 +67,7 @@
   }
 
   /* Theme: Zen Garden */
+  body[data-theme="zen"],
   [data-theme="zen"] {
     --background: #1a2e1e;
     --foreground: #f0fdf4;
@@ -75,6 +76,8 @@
     --muted: #86efac;
   }
 
+  /* Theme: Sunset Bliss */
+  body[data-theme="sunset"],
   [data-theme="sunset"] {
     --background: #2e1065;
     --foreground: #fae8ff;
