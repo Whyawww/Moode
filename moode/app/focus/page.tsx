@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import AmbientMixer from "@/components/features/audio/AmbientMixer";
 import SessionCompleteModal from "@/components/features/timer/SessionCompleteModal";
+import SoundManager from "@/components/features/audio/SoundManager";
 
 export default function FocusPage() {
   const { tasks } = useStore();
@@ -138,6 +139,7 @@ export default function FocusPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative p-6 transition-colors duration-500 overflow-hidden">
       <AuroraBackground />
+      <SoundManager />
       <button
         onClick={() => router.push("/dashboard")}
         className="absolute top-6 left-6 p-2 rounded-full bg-surface/20 hover:bg-surface/40 text-muted transition-all z-20"
