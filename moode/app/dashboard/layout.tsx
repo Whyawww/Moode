@@ -18,6 +18,30 @@ import Image from "next/image";
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 
+const themeColors = {
+  focus: {
+    "--background": "#0f172a",
+    "--foreground": "#f8fafc",
+    "--primary": "#38bdf8",
+    "--surface": "#1e293b",
+    "--muted": "#94a3b8",
+  },
+  zen: {
+    "--background": "#1a2e1e",
+    "--foreground": "#f0fdf4",
+    "--primary": "#4ade80",
+    "--surface": "#26412b",
+    "--muted": "#86efac",
+  },
+  sunset: {
+    "--background": "#2e1065",
+    "--foreground": "#fae8ff",
+    "--primary": "#f472b6",
+    "--surface": "#4c1d95",
+    "--muted": "#d8b4fe",
+  },
+};
+
 export default function DashboardLayout({
   children,
 }: {
@@ -34,6 +58,16 @@ export default function DashboardLayout({
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
+
+  useEffect(() => {
+    const currentTheme =
+      theme && themeColors[theme as keyof typeof themeColors] ? theme : "focus";
+    const colors = themeColors[currentTheme as keyof typeof themeColors];
+
+    Object.entries(colors).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(key, value);
+    });
+  }, [theme]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -81,10 +115,13 @@ export default function DashboardLayout({
     router.refresh();
   };
 
+  const currentTheme =
+    theme && themeColors[theme as keyof typeof themeColors] ? theme : "focus";
+
   return (
     <div
-      data-theme={theme}
-      className="min-h-screen bg-background flex flex-col relative overflow-hidden transition-colors duration-500"
+      data-theme={currentTheme}
+      className="relative min-h-screen w-full flex flex-col overflow-hidden transition-colors duration-700 ease-in-out text-foreground"
     >
       <AuroraBackground />
       <SoundManager />
