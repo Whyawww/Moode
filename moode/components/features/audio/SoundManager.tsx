@@ -31,13 +31,13 @@ export default function SoundManager() {
         preload: true,
         html5: true,
         onload: () => {
-          console.log(`✅ Audio loaded: ${key}`);
+          console.log(`Audio loaded: ${key}`);
         },
         onloaderror: (id, err) => {
-          console.error(`❌ Gagal load audio: ${key}`, err);
+          console.error(`Gagal load audio: ${key}`, err);
         },
         onplayerror: (id, err) => {
-          console.warn(`⚠️ Autoplay blocked for: ${key}`, err);
+          console.warn(`Autoplay blocked for: ${key}`, err);
           sounds.current[key]?.once("unlock", () => {
             sounds.current[key]?.play();
           });
@@ -50,7 +50,7 @@ export default function SoundManager() {
     const unlockAudio = () => {
       if (Howler.ctx.state === "suspended") {
         Howler.ctx.resume().then(() => {
-          console.log("🔊 AudioContext Resumed!");
+          console.log("AudioContext Resumed!");
         });
       }
     };

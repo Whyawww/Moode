@@ -84,7 +84,7 @@ export default function DashboardLayout({
   return (
     <div
       data-theme={theme}
-      className="min-h-screen flex flex-col relative overflow-hidden transition-colors duration-500"
+      className="min-h-screen bg-background flex flex-col relative overflow-hidden transition-colors duration-500"
     >
       <AuroraBackground />
       <SoundManager />
