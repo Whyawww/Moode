@@ -1,5 +1,17 @@
+import type { Metadata } from "next";
 import AmbientMixer from "@/components/features/audio/AmbientMixer";
 import TaskList from "@/components/features/tasks/TaskList";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description:
+    "Your personal focus space. Manage tasks, mix ambient sounds, and find your flow state.",
+  openGraph: {
+    title: "Moode | Dashboard",
+    description: "Find your flow and master your focus.",
+    type: "website",
+  },
+};
 
 export default function DashboardPage() {
   return (

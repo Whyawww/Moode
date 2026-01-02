@@ -6,40 +6,86 @@
   --color-primary: var(--primary);
   --color-surface: var(--surface);
   --color-muted: var(--muted);
+
+  /* Animasi Aurora & Shimmer */
+  --animate-aurora-1: aurora-drift 20s infinite alternate ease-in-out;
+  --animate-aurora-2: aurora-drift 25s infinite alternate-reverse ease-in-out;
+  --animate-aurora-3: aurora-drift 30s infinite alternate ease-in-out;
+  --animate-shimmer: shimmer 3s ease-in-out infinite alternate;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes aurora-drift {
+    0% {
+      transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+    50% {
+      transform: translate(10%, 5%) rotate(5deg) scale(1.1);
+    }
+    100% {
+      transform: translate(-5%, 10%) rotate(-5deg) scale(0.9);
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0.7;
+      transform: scale(1.05);
+    }
+  }
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
 }
 
-:root {
-  /* Default Theme: Deep Focus */
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  --primary: #38bdf8;
-  --surface: #1e293b;
-  --muted: #94a3b8;
-}
+/* VARIABEL TEMA */
+@layer base {
+  :root {
+    /* Default Theme: Deep Focus */
+    --background: #0f172a;
+    --foreground: #f8fafc;
+    --primary: #38bdf8;
+    --surface: #1e293b;
+    --muted: #94a3b8;
+  }
 
-/* Theme: Zen Garden */
-[data-theme="zen"] {
-  --background: #1a2e1e;
-  --foreground: #f0fdf4;
-  --primary: #4ade80;
-  --surface: #26412b;
-  --muted: #86efac;
-}
+  /* Theme: Zen Garden */
+  [data-theme="zen"] {
+    --background: #1a2e1e;
+    --foreground: #f0fdf4;
+    --primary: #4ade80;
+    --surface: #26412b;
+    --muted: #86efac;
+  }
 
-/* Theme: Sunset Lofi */
-[data-theme="sunset"] {
-  --background: #2e1065;
-  --foreground: #fae8ff;
-  --primary: #f472b6;
-  --surface: #4c1d95;
-  --muted: #d8b4fe;
-}
+  [data-theme="sunset"] {
+    --background: #2e1065;
+    --foreground: #fae8ff;
+    --primary: #f472b6;
+    --surface: #4c1d95;
+    --muted: #d8b4fe;
+  }
 
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  transition-property: color, background-color, border-color,
-    text-decoration-color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 500ms;
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.5s, color 0.5s;
+  }
 }

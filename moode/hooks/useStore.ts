@@ -38,7 +38,7 @@ interface AppState {
 export const useStore = create<AppState>((set, get) => ({
   theme: "focus",
   setTheme: (theme) => set({ theme }),
-  volumes: { rain: 0.5, cafe: 0, fire: 0 },
+  volumes: { rain: 0.2, cafe: 0, fire: 0 },
   setVolume: (type, value) =>
     set((state) => ({
       volumes: { ...state.volumes, [type]: value },

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Moode - History",
+  title: "History",
 
   description:
     "Track your productivity streaks and review completed tasks over time.",

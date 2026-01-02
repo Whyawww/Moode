@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useStore } from "@/hooks/useStore";
 import { useRouter } from "next/navigation";
+import AuroraBackground from "@/components/ui/AuroraBackground";
 import {
   Pause,
   Play,
@@ -69,7 +70,7 @@ export default function FocusPage() {
         currentTask?.title || "Focus"
       } - Moode`;
     } else {
-      document.title = "Moode - Focus Room";
+      document.title = "Moode | Focus Room";
     }
   }, [timeLeft, isActive, currentTask]);
 
@@ -136,6 +137,7 @@ export default function FocusPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative p-6 transition-colors duration-500 overflow-hidden">
+      <AuroraBackground />
       <button
         onClick={() => router.push("/dashboard")}
         className="absolute top-6 left-6 p-2 rounded-full bg-surface/20 hover:bg-surface/40 text-muted transition-all z-20"

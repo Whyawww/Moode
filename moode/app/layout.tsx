@@ -8,8 +8,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Moode",
-    default: "Moode - Aesthetic Focus Tool",
+    template: "Moode | %s ",
+    default: "Moode | Aesthetic Focus Tool",
   },
   description:
     "Productivity reimagined for students. Mix sounds, set tasks, and flow.",

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useStore } from "@/hooks/useStore";
+import AuroraBackground from "@/components/ui/AuroraBackground";
 import {
   Monitor,
   Leaf,
@@ -80,17 +81,20 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden transition-colors duration-500">
-      <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-transparent pointer-events-none" />
+    <div
+      data-theme={theme}
+      className="min-h-screen flex flex-col relative overflow-hidden transition-colors duration-500"
+    >
+      <AuroraBackground />
 
       <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="max-w-3xl mx-auto backdrop-blur-md bg-surface/30 border border-white/10 rounded-full px-6 py-3 flex items-center justify-between shadow-lg">
-          {/* LOGO */}
           <div className="font-bold text-lg tracking-tight text-primary flex items-center gap-2">
             Moode
           </div>
 
           <div className="flex items-center gap-4">
+            {/* THEME SWITCHER */}
             <div className="flex gap-2">
               <button
                 onClick={() => setTheme("focus")}
@@ -127,8 +131,7 @@ export default function DashboardLayout({
               </button>
             </div>
 
-            {/* --- USER PROFILE DROPDOWN --- */}
-            {user && (
+            {user ? (
               <div
                 className="relative pl-4 border-l border-white/10"
                 ref={dropdownRef}
@@ -175,7 +178,6 @@ export default function DashboardLayout({
                       </p>
                     </div>
 
-                    {/* History */}
                     <Link
                       href="/dashboard/history"
                       onClick={() => setIsDropdownOpen(false)}
@@ -185,7 +187,6 @@ export default function DashboardLayout({
                       History
                     </Link>
 
-                    {/* Logout */}
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left"
@@ -196,15 +197,16 @@ export default function DashboardLayout({
                   </div>
                 )}
               </div>
+            ) : (
+              <div className="pl-4 border-l border-white/10 flex items-center gap-3">
+                <Link
+                  href="/auth/login"
+                  className="px-4 py-1.5 text-sm font-bold bg-primary text-background rounded-full hover:opacity-90 transition-all"
+                >
+                  Login
+                </Link>
+              </div>
             )}
-            <div className="pl-4 border-l border-white/10 flex items-center gap-3">
-              <Link
-                href="/auth/login"
-                className="px-4 py-1.5 text-sm font-bold bg-primary text-background rounded-full hover:opacity-90 transition-all"
-              >
-                Login
-              </Link>
-            </div>
           </div>
         </div>
       </header>

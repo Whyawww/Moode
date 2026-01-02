@@ -19,6 +19,7 @@
     "react": "19.2.3",
     "react-day-picker": "^9.13.0",
     "react-dom": "19.2.3",
+    "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
