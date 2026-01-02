@@ -22,7 +22,7 @@ export default function SessionCompleteModal({
   const { toggleTask } = useStore();
 
   const handleFinish = () => {
-    toggleTask(taskId);
+    toggleTask(taskId, true);
     router.push("/dashboard");
   };
 
