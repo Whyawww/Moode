@@ -25,16 +25,22 @@ export default function SoundManager() {
     soundConfig.forEach(({ key, src }) => {
       sounds.current[key] = new Howl({
         src: [src],
+        format: ["mp3"],
         loop: true,
         volume: 0,
         preload: true,
-        html5: false,
-        onloaderror: (id, err) =>
-          console.error(`❌ Gagal load audio: ${key}`, err),
+        html5: true,
+        onload: () => {
+          console.log(`✅ Audio loaded: ${key}`);
+        },
+        onloaderror: (id, err) => {
+          console.error(`❌ Gagal load audio: ${key}`, err);
+        },
         onplayerror: (id, err) => {
-          sounds.current[key]?.once("unlock", () =>
-            sounds.current[key]?.play()
-          );
+          console.warn(`⚠️ Autoplay blocked for: ${key}`, err);
+          sounds.current[key]?.once("unlock", () => {
+            sounds.current[key]?.play();
+          });
         },
       });
     });
@@ -42,14 +48,21 @@ export default function SoundManager() {
     Object.values(sounds.current).forEach((sound) => sound?.play());
 
     const unlockAudio = () => {
-      if (Howler.ctx.state === "suspended") Howler.ctx.resume();
+      if (Howler.ctx.state === "suspended") {
+        Howler.ctx.resume().then(() => {
+          console.log("🔊 AudioContext Resumed!");
+        });
+      }
     };
+
     document.addEventListener("click", unlockAudio);
     document.addEventListener("keydown", unlockAudio);
+    document.addEventListener("touchstart", unlockAudio);
 
     return () => {
       document.removeEventListener("click", unlockAudio);
       document.removeEventListener("keydown", unlockAudio);
+      document.removeEventListener("touchstart", unlockAudio);
       Object.values(sounds.current).forEach((sound) => sound?.unload());
     };
   }, []);
@@ -59,15 +72,9 @@ export default function SoundManager() {
 
     Howler.mute(shouldMute);
 
-    if (sounds.current.rain) {
-      sounds.current.rain.volume(shouldMute ? 0 : volumes.rain);
-    }
-    if (sounds.current.cafe) {
-      sounds.current.cafe.volume(shouldMute ? 0 : volumes.cafe);
-    }
-    if (sounds.current.fire) {
-      sounds.current.fire.volume(shouldMute ? 0 : volumes.fire);
-    }
+    if (sounds.current.rain) sounds.current.rain.volume(volumes.rain);
+    if (sounds.current.cafe) sounds.current.cafe.volume(volumes.cafe);
+    if (sounds.current.fire) sounds.current.fire.volume(volumes.fire);
   }, [volumes, pathname]);
 
   return null;
