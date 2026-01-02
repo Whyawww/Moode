@@ -41,11 +41,12 @@ export default function LoginForm() {
   );
 
   const handleLogin = async () => {
+    const origin = window.location.origin;
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${location.origin}/auth/callback`,
+        redirectTo: `${origin}/auth/callback`,
         queryParams: { access_type: "offline", prompt: "consent" },
       },
     });

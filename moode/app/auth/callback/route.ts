@@ -5,11 +5,9 @@ import { cookies } from "next/headers";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  // Default redirect ke dashboard kalau sukses
   const next = searchParams.get("next") ?? "/dashboard";
 
   if (code) {
-    // FIX UTAMA: Tambah 'await' disini karena di Next.js 15 cookies() itu Promise
     const cookieStore = await cookies();
 
     const supabase = createServerClient(
@@ -30,7 +28,6 @@ export async function GET(request: Request) {
       }
     );
 
-    // Tukar code jadi session
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
@@ -38,6 +35,5 @@ export async function GET(request: Request) {
     }
   }
 
-  // Kalau gagal
   return NextResponse.redirect(`${origin}/auth/auth-code-error`);
 }
