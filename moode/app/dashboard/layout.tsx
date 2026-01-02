@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useStore } from "@/hooks/useStore";
 import AuroraBackground from "@/components/ui/AuroraBackground";
+import SoundManager from "@/components/features/audio/SoundManager";
 import {
   Monitor,
   Leaf,
@@ -86,6 +87,7 @@ export default function DashboardLayout({
       className="min-h-screen flex flex-col relative overflow-hidden transition-colors duration-500"
     >
       <AuroraBackground />
+      <SoundManager />
 
       <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
         <div className="max-w-3xl mx-auto backdrop-blur-md bg-surface/30 border border-white/10 rounded-full px-6 py-3 flex items-center justify-between shadow-lg">
