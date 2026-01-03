@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 const GoogleIcon = () => (
   <svg
@@ -42,17 +43,22 @@ export default function LoginForm() {
 
   const handleLogin = async () => {
     const origin = window.location.origin;
-    setLoading(true);
+
+    const toastId = toast.loading("Connecting to Google...");
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${origin}/auth/callback`,
-        queryParams: { access_type: "offline", prompt: "consent" },
       },
     });
+
     if (error) {
-      alert("Error logging in: " + error.message);
-      setLoading(false);
+      toast.dismiss(toastId);
+      toast.error("Login Failed: " + error.message);
+    } else {
+      toast.dismiss(toastId);
+      toast.success("Redirecting to Google...");
     }
   };
 

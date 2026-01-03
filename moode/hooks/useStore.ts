@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createBrowserClient } from "@supabase/ssr";
+import { toast } from "sonner";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -79,12 +80,18 @@ export const useStore = create<AppState>((set, get) => ({
 
   addTask: async (title) => {
     const activeCount = get().tasks.filter((t) => !t.completed).length;
-    if (activeCount >= 7) return;
+    if (activeCount >= 7) {
+      toast.warning("Focus limit reached (7 tasks max).");
+      return;
+    }
 
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      toast.error("Please login to save tasks.");
+      return;
+    }
 
     const { data, error } = await supabase
       .from("tasks")
@@ -94,6 +101,7 @@ export const useStore = create<AppState>((set, get) => ({
 
     if (error) {
       console.error("Error nambah task:", error);
+      toast.error("Failed to add task.");
     } else if (data) {
       const newTask: Task = {
         id: data.id,
@@ -104,16 +112,25 @@ export const useStore = create<AppState>((set, get) => ({
       set((state) => ({
         tasks: [...state.tasks, newTask],
       }));
+      toast.success("Task added to flow!");
     }
   },
 
   removeTask: async (id) => {
+    const previousTasks = get().tasks;
+
+    set((state) => ({
+      tasks: state.tasks.filter((t) => t.id !== id),
+    }));
+
     const { error } = await supabase.from("tasks").delete().eq("id", id);
 
-    if (!error) {
-      set((state) => ({
-        tasks: state.tasks.filter((t) => t.id !== id),
-      }));
+    if (error) {
+      console.error("Gagal hapus:", error);
+      set({ tasks: previousTasks });
+      toast.error("Failed to delete task.");
+    } else {
+      toast.info("Task removed.");
     }
   },
 

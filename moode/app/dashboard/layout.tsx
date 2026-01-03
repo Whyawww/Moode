@@ -17,6 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const themeColors = {
   focus: {
@@ -82,6 +83,11 @@ export default function DashboardLayout({
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (_event === "SIGNED_IN") {
+        toast.success("Welcome back to your flow!");
+        fetchTasks();
+      }
+
       if (_event === "SIGNED_OUT") {
         fetchTasks();
         router.refresh();
@@ -110,6 +116,7 @@ export default function DashboardLayout({
 
   const handleLogout = async () => {
     setIsDropdownOpen(false);
+    toast.success("See you next time! 👋");
     await supabase.auth.signOut();
     router.push("/");
     router.refresh();
