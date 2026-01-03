@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStore, Task } from "@/hooks/useStore";
 import { Plus, X, Play, Circle, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
@@ -11,8 +11,20 @@ export default function TaskList() {
   const [inputValue, setInputValue] = useState("");
   const router = useRouter();
 
+  const isToday = (date: Date | undefined) => {
+    if (!date) return false;
+    const today = new Date();
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  };
+
   const activeTasks = tasks.filter((t) => !t.completed);
-  const completedTasks = tasks.filter((t) => t.completed);
+  const completedTasks = tasks.filter((t) => {
+    return t.completed && t.completedAt && isToday(new Date(t.completedAt));
+  });
 
   const ACTIVE_LIMIT = 7;
   const isFull = activeTasks.length >= ACTIVE_LIMIT;
