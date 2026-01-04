@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useStore, Task } from "@/hooks/useStore";
+import TaskListSkeleton from "@/components/providers/TaskListSkeleton";
 import { Plus, X, Play, Circle, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -10,6 +11,10 @@ export default function TaskList() {
   const { tasks, addTask, removeTask, toggleTask } = useStore();
   const [inputValue, setInputValue] = useState("");
   const router = useRouter();
+  const isLoading = tasks === null;
+  if (isLoading) {
+    return <TaskListSkeleton />;
+  }
 
   const isToday = (date: Date | undefined) => {
     if (!date) return false;
