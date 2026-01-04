@@ -34,6 +34,10 @@ interface AppState {
   addTask: (title: string) => Promise<void>;
   removeTask: (id: string) => Promise<void>;
   toggleTask: (id: string, currentStatus: boolean) => Promise<void>;
+
+  currentNote: string;
+  fetchNote: (date: Date) => Promise<void>;
+  saveNote: (date: Date, content: string) => Promise<void>;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -160,6 +164,62 @@ export const useStore = create<AppState>((set, get) => ({
             : t
         ),
       }));
+    }
+  },
+
+  currentNote: "",
+
+  fetchNote: async (date) => {
+    set({ currentNote: "" });
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const dateString = date.toLocaleDateString("en-CA");
+
+    const { data, error } = await supabase
+      .from("daily_notes")
+      .select("content")
+      .eq("user_id", user.id)
+      .eq("date", dateString)
+      .single();
+
+    if (error && error.code !== "PGRST116") {
+      console.error("Error fetching note:", error);
+    }
+
+    if (data) {
+      set({ currentNote: data.content });
+    }
+  },
+
+  saveNote: async (date, content) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Login to save notes");
+      return;
+    }
+
+    const dateString = date.toLocaleDateString("en-CA");
+
+    set({ currentNote: content });
+
+    const { error } = await supabase.from("daily_notes").upsert(
+      {
+        user_id: user.id,
+        date: dateString,
+        content: content,
+      },
+      { onConflict: "user_id, date" }
+    );
+
+    if (error) {
+      console.error("Gagal save note:", error);
+      toast.error("Failed to save note");
     }
   },
 }));

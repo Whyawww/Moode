@@ -16,7 +16,14 @@ export default function Navbar() {
             priority
           />
         </div>
-        <span>Moode</span>
+        <Image
+          src="/moode.png"
+          alt="Moode"
+          width={120}
+          height={30}
+          className="object-contain"
+          priority
+        />
       </div>
 
       <Link

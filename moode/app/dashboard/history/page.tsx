@@ -1,93 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useStore } from "@/hooks/useStore";
-import { DayPicker } from "react-day-picker";
-import { format, isSameDay } from "date-fns";
-import {
-  ArrowLeft,
-  CalendarDays,
-  CheckCircle2,
-  AlertCircle,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import "react-day-picker/dist/style.css";
+import { ArrowLeft, CalendarDays } from "lucide-react";
+
+import HistoryCalendar from "@/components/features/history/HistoryCalender";
+import DailyNote from "@/components/features/history/DailyNotes";
+import HistoryTaskList from "@/components/features/history/HistoryTaskList";
 
 export default function HistoryPage() {
-  const { tasks } = useStore();
   const router = useRouter();
-
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date()
   );
 
-  const historyTasks = tasks.filter((task) => {
-    if (!task.completed || !task.completedAt) return false;
-    return selectedDate ? isSameDay(task.completedAt, selectedDate) : false;
-  });
-
-  const css = `
-    .rdp { 
-        margin: 0; 
-        --rdp-cell-size: 45px; 
-    }
-    .rdp-month { 
-        background-color: transparent; 
-    }
-    .rdp-caption_label {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--foreground);
-    }
-    .rdp-nav_button {
-        color: var(--muted);
-        border-radius: 10px;
-    }
-    .rdp-nav_button:hover {
-        color: var(--foreground);
-        background-color: var(--surface);
-    }
-    
-    .rdp-day {
-        color: var(--foreground);
-        font-weight: 500;
-        transition: all 0.2s ease;
-        border-radius: 12px;
-    }
-    .rdp-day:hover:not([disabled]) { 
-        background-color: var(--surface); 
-        color: var(--primary);
-    }
-
-    .rdp-day_today { 
-        color: var(--primary); 
-        font-weight: 900;
-        border: 1px solid var(--primary);
-        background-color: transparent;
-    }
-
-    .rdp-day_selected:not([disabled]), 
-    .rdp-day_selected:focus:not([disabled]), 
-    .rdp-day_selected:active:not([disabled]), 
-    .rdp-day_selected:hover:not([disabled]) { 
-        background-color: var(--primary) !important; 
-        color: var(--background) !important;
-        font-weight: bold !important;
-        
-        border-radius: 100% !important; 
-        
-        box-shadow: 0 0 15px var(--primary); 
-        transform: scale(1.1);
-        border: 2px solid var(--background);
-    }
-  `;
-
   return (
-    <div className="min-h-screen p-6 pt-24 max-w-4xl mx-auto space-y-8">
-      <style>{css}</style>
-
-      {/* Header */}
+    <div className="min-h-screen p-6 pt-24 max-w-5xl mx-auto space-y-8">
       <div className="flex items-center gap-4">
         <button
           onClick={() => router.push("/dashboard")}
@@ -99,77 +27,21 @@ export default function HistoryPage() {
           <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <CalendarDays className="text-primary" /> History
           </h1>
-          <p className="text-muted">Track your consistency.</p>
+          <p className="text-muted">Track your consistency & reflections.</p>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-[auto_1fr] gap-8 items-start">
-        <div className="w-full md:w-auto flex justify-center md:justify-start">
-          <div className="p-6 rounded-3xl bg-surface/30 border border-white/5 backdrop-blur-md shadow-2xl">
-            <DayPicker
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              modifiersClassNames={{
-                selected: "my-selected",
-              }}
-              // Hapus styles inline disini biar gak bentrok sama CSS string di atas
-            />
-          </div>
+      <div className="grid md:grid-cols-[350px_1fr] gap-8 items-start">
+        <div className="w-full flex flex-col">
+          <HistoryCalendar
+            selectedDate={selectedDate}
+            onSelect={setSelectedDate}
+          />
+
+          <DailyNote date={selectedDate} />
         </div>
 
-        {/* LIST TASK */}
-        <div className="space-y-4 w-full">
-          <h2 className="text-xl font-semibold text-foreground border-b border-white/10 pb-4 flex justify-between items-center">
-            <span>
-              {selectedDate
-                ? format(selectedDate, "MMMM do, yyyy")
-                : "Select a date"}
-            </span>
-            <span className="text-xs font-normal text-muted bg-surface/50 px-2 py-1 rounded-lg">
-              {historyTasks.length} Completed
-            </span>
-          </h2>
-
-          <div className="space-y-3">
-            {historyTasks.length === 0 ? (
-              <div className="text-center py-12 px-6 text-muted bg-surface/10 rounded-2xl border border-dashed border-white/10 flex flex-col items-center gap-3">
-                <AlertCircle size={32} className="opacity-50" />
-                <p>No tasks found for this date.</p>
-                {isSameDay(selectedDate || new Date(), new Date()) && (
-                  <p className="text-xs opacity-50 max-w-[200px]">
-                    Tip: Completed tasks from before the update need to be
-                    unchecked & re-checked to appear here.
-                  </p>
-                )}
-              </div>
-            ) : (
-              <AnimatePresence>
-                {historyTasks.map((task, i) => (
-                  <motion.div
-                    key={task.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex items-center gap-4 p-4 rounded-xl bg-surface/40 border border-white/5 hover:bg-surface/60 transition-colors"
-                  >
-                    <div className="p-2 rounded-full bg-primary/10 text-primary">
-                      <CheckCircle2 size={18} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground line-through opacity-70 truncate">
-                        {task.title}
-                      </p>
-                      <p className="text-xs text-muted">
-                        Completed at {format(task.completedAt!, "HH:mm")}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            )}
-          </div>
-        </div>
+        <HistoryTaskList date={selectedDate} />
       </div>
     </div>
   );

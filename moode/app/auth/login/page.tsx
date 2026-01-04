@@ -26,17 +26,15 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-[450px] flex flex-col items-center text-center space-y-8">
         <div className="flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-700">
           {/* Logo */}
-          <div className="relative w-16 h-16 mb-4">
+          <div className="relative w-24 h-24 md:w-32 md:h-32 mb-6 transition-all duration-300">
             <Image
-              src="/logo.png"
+              src="/icon.png"
               alt="Moode"
               fill
               className="object-contain drop-shadow-lg"
             />
           </div>
-          <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">
-            Moode.
-          </h1>
+
           <h2 className="text-xl text-muted flex items-center gap-2">
             Find your flow, master your focus.{" "}
             <Sparkles size={16} className="text-primary inline" />

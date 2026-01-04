@@ -18,7 +18,6 @@ export default function DashboardLayout({
   const { fetchTasks } = useStore();
   const router = useRouter();
 
-  //hook tema
   const { currentTheme } = useThemeEffect();
 
   const supabase = createBrowserClient(
@@ -26,7 +25,6 @@ export default function DashboardLayout({
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Auth Listener
   useEffect(() => {
     fetchTasks();
 
