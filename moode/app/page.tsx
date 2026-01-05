@@ -4,6 +4,7 @@ import Navbar from "@/components/landing/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
 import DemoPreview from "@/components/landing/DemoPreview";
 import HowItWorks from "@/components/landing/HowItWorks";
+import FeatureWalkthrough from "@/components/landing/FeatureWalkthrough";
 import { useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr/dist/main/createBrowserClient";
 import { useRouter } from "next/dist/client/components/navigation";
@@ -41,8 +42,9 @@ export default function LandingPage() {
 
       <main className="flex-1 w-full flex flex-col pt-10 overflow-x-hidden">
         <HeroSection />
-        <DemoPreview />
         <HowItWorks />
+        <DemoPreview />
+        <FeatureWalkthrough />
       </main>
 
       <footer className="w-full py-8 text-center border-t border-white/5 bg-background/50 backdrop-blur-sm z-10 relative">
