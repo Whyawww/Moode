@@ -8,6 +8,8 @@ import FeatureWalkthrough from "@/components/landing/FeatureWalkthrough";
 import { useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr/dist/main/createBrowserClient";
 import { useRouter } from "next/dist/client/components/navigation";
+import FAQ from "@/components/landing/FAQ";
+import BottomCTA from "@/components/landing/BottomCTA";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -45,6 +47,8 @@ export default function LandingPage() {
         <HowItWorks />
         <DemoPreview />
         <FeatureWalkthrough />
+        <FAQ />
+        <BottomCTA />
       </main>
 
       <footer className="w-full py-8 text-center border-t border-white/5 bg-background/50 backdrop-blur-sm z-10 relative">
