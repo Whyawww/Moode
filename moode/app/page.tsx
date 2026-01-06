@@ -5,33 +5,10 @@ import HeroSection from "@/components/landing/HeroSection";
 import DemoPreview from "@/components/landing/DemoPreview";
 import HowItWorks from "@/components/landing/HowItWorks";
 import FeatureWalkthrough from "@/components/landing/FeatureWalkthrough";
-import { useEffect } from "react";
-import { createBrowserClient } from "@supabase/ssr/dist/main/createBrowserClient";
-import { useRouter } from "next/dist/client/components/navigation";
 import FAQ from "@/components/landing/FAQ";
 import BottomCTA from "@/components/landing/BottomCTA";
 
 export default function LandingPage() {
-  const router = useRouter();
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (session) {
-        router.replace("/dashboard");
-      }
-    };
-
-    checkSession();
-  }, [router, supabase]);
   return (
     <div className="min-h-screen w-full flex flex-col relative bg-background text-foreground overflow-x-hidden selection:bg-primary/30">
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
