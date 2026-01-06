@@ -38,6 +38,7 @@ export default function FocusPage() {
 
   const [secondsPassed, setSecondsPassed] = useState(0);
   const [tasksDoneCount, setTasksDoneCount] = useState(0);
+  const [finishedTaskTitle, setFinishedTaskTitle] = useState("");
 
   const inputRef = useRef<HTMLInputElement>(null);
   const currentTask = tasks.find((t) => !t.completed) || tasks[0];
@@ -61,8 +62,11 @@ export default function FocusPage() {
   const handleSessionEnd = () => {
     const passed = initialTime - timeLeft;
     setSecondsPassed(passed > 0 ? passed : 0);
-
     setTasksDoneCount(currentTask ? 1 : 0);
+
+    const titleToFreeze = currentTask ? currentTask.title : "Free Flow";
+    setFinishedTaskTitle(titleToFreeze);
+
     setShowModal(true);
   };
 
@@ -107,7 +111,7 @@ export default function FocusPage() {
         }}
         durationSeconds={secondsPassed}
         tasksCompleted={tasksDoneCount}
-        taskTitle={currentTask?.title}
+        taskTitle={finishedTaskTitle}
       />
 
       <div className="max-w-md w-full text-center space-y-8 z-10">
@@ -116,7 +120,7 @@ export default function FocusPage() {
             Current Focus
           </span>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight text-foreground line-clamp-2">
-            {currentTask?.title || "Free Flow"}
+            {finishedTaskTitle || currentTask?.title || "Free Flow"}
           </h1>
         </div>
 
@@ -189,6 +193,7 @@ export default function FocusPage() {
           <button
             onClick={() => {
               if (window.confirm("Reset timer?")) resetTimer();
+              setFinishedTaskTitle("");
             }}
             className="p-4 rounded-full bg-surface text-muted hover:bg-red-500/10 hover:text-red-400 hover:scale-105 transition-all"
             title="Reset Timer"
