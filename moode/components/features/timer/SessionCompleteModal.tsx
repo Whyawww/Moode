@@ -8,20 +8,37 @@ import { useEffect } from "react";
 interface SessionCompleteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  duration: number;
+  durationSeconds: number;
   tasksCompleted: number;
+  taskTitle?: string; 
 }
 
 export default function SessionCompleteModal({
   isOpen,
   onClose,
-  duration,
+  durationSeconds,
   tasksCompleted,
+  taskTitle,
 }: SessionCompleteModalProps) {
+  const formatDuration = (totalSeconds: number) => {
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+
+    if (m === 0) return `${s}s`;
+    if (s === 0) return `${m}m`;
+    return `${m}m ${s}s`;
+  };
+
+  const formattedTime = formatDuration(durationSeconds);
+
   const handleShare = async () => {
+    const focusContext = taskTitle
+      ? `focused on "${taskTitle}"`
+      : "deep work session";
+
     const taskText =
       tasksCompleted > 0 ? `✅ Crushed ${tasksCompleted} tasks.\n` : "";
-    const shareText = `🚀 Just completed a ${duration}-minute deep work session on Moode!\n\n${taskText}Focus shouldn't be boring. Try it here:`;
+    const shareText = `🚀 Just completed a ${formattedTime} ${focusContext} on Moode!\n\n${taskText}Focus shouldn't be boring. Try it here:`;
     const shareUrl = "https://moode-six.vercel.app/";
     const fullContent = `${shareText} ${shareUrl}`;
 
@@ -82,7 +99,6 @@ export default function SessionCompleteModal({
             aria-hidden="true"
           />
 
-          {/* Modal Content */}
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -109,20 +125,28 @@ export default function SessionCompleteModal({
                 <h2 className="text-2xl font-bold text-foreground">
                   Session Complete!
                 </h2>
-                <p className="text-muted">
-                  You kept the flow going. Great job!
-                </p>
+                {taskTitle ? (
+                  <p className="text-muted">
+                    You just crushed{" "}
+                    <span className="text-primary font-medium">
+                      "{taskTitle}"
+                    </span>
+                    .
+                  </p>
+                ) : (
+                  <p className="text-muted">
+                    You kept the flow going. Great job!
+                  </p>
+                )}
               </div>
 
-              {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-2xl bg-surface/50 border border-white/5 flex flex-col items-center gap-2 transition-colors hover:bg-surface/70">
                   <Clock size={20} className="text-primary" />
                   <div>
-                    <span className="text-2xl font-bold text-foreground">
-                      {duration}
+                    <span className="text-xl font-bold text-foreground">
+                      {formattedTime}
                     </span>
-                    <span className="text-xs text-muted ml-1">min</span>
                   </div>
                   <span className="text-xs text-muted/60 uppercase tracking-wider">
                     Focus Time
@@ -132,7 +156,7 @@ export default function SessionCompleteModal({
                 <div className="p-4 rounded-2xl bg-surface/50 border border-white/5 flex flex-col items-center gap-2 transition-colors hover:bg-surface/70">
                   <CheckCircle2 size={20} className="text-green-400" />
                   <div>
-                    <span className="text-2xl font-bold text-foreground">
+                    <span className="text-xl font-bold text-foreground">
                       {tasksCompleted}
                     </span>
                     <span className="text-xs text-muted ml-1">tasks</span>
@@ -150,10 +174,6 @@ export default function SessionCompleteModal({
                 <Share2 size={18} />
                 Share Statistics
               </button>
-
-              <p className="text-xs text-muted/50 pt-2">
-                Tip: Sharing your streak builds habit consistency.
-              </p>
             </div>
           </motion.div>
         </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useStore } from "@/hooks/useStore";
+import { useFocusTimer } from "@/hooks/useFocusTimer";
 import { useRouter } from "next/navigation";
 import AuroraBackground from "@/components/ui/AuroraBackground";
 import {
@@ -17,100 +18,61 @@ import SessionCompleteModal from "@/components/features/timer/SessionCompleteMod
 import SoundManager from "@/components/features/audio/SoundManager";
 
 export default function FocusPage() {
-  const { tasks } = useStore();
+  const { tasks, toggleTask } = useStore();
   const router = useRouter();
 
-  const [initialTime, setInitialTime] = useState(25 * 60);
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
-  const [isActive, setIsActive] = useState(false);
+  const {
+    timeLeft,
+    isActive,
+    initialTime,
+    toggleTimer,
+    resetTimer,
+    setDuration,
+    setTimeLeft,
+    setInitialTime,
+    formatTime,
+  } = useFocusTimer(25);
+
   const [isEditing, setIsEditing] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const endTimeRef = useRef<number | null>(null);
+  const [secondsPassed, setSecondsPassed] = useState(0);
+  const [tasksDoneCount, setTasksDoneCount] = useState(0);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const currentTask = tasks.find((t) => !t.completed) || tasks[0];
 
   useEffect(() => {
-    if ("Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     if (isActive) {
-      if (!endTimeRef.current) {
-        endTimeRef.current = Date.now() + timeLeft * 1000;
-      }
-
-      interval = setInterval(() => {
-        const now = Date.now();
-        const remaining = Math.ceil((endTimeRef.current! - now) / 1000);
-
-        if (remaining <= 0) {
-          setTimeLeft(0);
-          setIsActive(false);
-          endTimeRef.current = null;
-          handleComplete();
-        } else {
-          setTimeLeft(remaining);
-        }
-      }, 200);
-    } else {
-      endTimeRef.current = null;
-    }
-
-    return () => clearInterval(interval);
-  }, [isActive]);
-
-  useEffect(() => {
-    const formatted = formatTime(timeLeft);
-    if (isActive) {
-      document.title = `(${formatted}) ${
+      document.title = `(${formatTime(timeLeft)}) ${
         currentTask?.title || "Focus"
-      } - Moode`;
+      }`;
     } else {
       document.title = "Moode | Focus Room";
     }
-  }, [timeLeft, isActive, currentTask]);
+  }, [timeLeft, isActive, currentTask, formatTime]);
 
-  const handleComplete = () => {
-    if ("Notification" in window && Notification.permission === "granted") {
-      new Notification("Time's Up! 🎉", {
-        body: `You finished: ${currentTask?.title}`,
-      });
+  useEffect(() => {
+    if (timeLeft === 0 && initialTime > 0 && !isActive) {
+      handleSessionEnd();
     }
+  }, [timeLeft, isActive, initialTime]);
+
+  const handleSessionEnd = () => {
+    const passed = initialTime - timeLeft;
+    setSecondsPassed(passed > 0 ? passed : 0);
+
+    setTasksDoneCount(currentTask ? 1 : 0);
     setShowModal(true);
   };
 
-  const handleFinishEarly = () => {
-    setIsActive(false);
-    endTimeRef.current = null;
-    handleComplete();
-  };
+  const handleFinishEarly = async () => {
+    toggleTimer();
 
-  const handleReset = () => {
-    if (timeLeft === initialTime) return;
-
-    const confirmReset = window.confirm(
-      "Are you sure you want to reset the timer? Current progress will be lost."
-    );
-    if (confirmReset) {
-      setIsActive(false);
-      setIsEditing(false);
-      setTimeLeft(initialTime);
-      endTimeRef.current = null;
+    if (currentTask && !currentTask.completed) {
+      await toggleTask(currentTask.id, false);
     }
-  };
-
-  const handleDurationChange = (minutes: number) => {
-    const seconds = minutes * 60;
-    setInitialTime(seconds);
-    setTimeLeft(seconds);
-    setIsActive(false);
-    setIsEditing(false);
-    endTimeRef.current = null;
+    handleSessionEnd();
   };
 
   const handleManualInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,26 +82,16 @@ export default function FocusPage() {
       const seconds = val * 60;
       setInitialTime(seconds);
       setTimeLeft(seconds);
-      endTimeRef.current = null;
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
-
   const currentMinutes = Math.floor(initialTime / 60);
-
-  if (!currentTask) return null;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative p-6 transition-colors duration-500 overflow-hidden">
       <AuroraBackground />
       <SoundManager />
+
       <button
         onClick={() => router.push("/dashboard")}
         className="absolute top-6 left-6 p-2 rounded-full bg-surface/20 hover:bg-surface/40 text-muted transition-all z-20"
@@ -149,9 +101,13 @@ export default function FocusPage() {
 
       <SessionCompleteModal
         isOpen={showModal}
-        taskTitle={currentTask.title}
-        durationSeconds={Math.max(0, initialTime - timeLeft)}
-        taskId={currentTask.id}
+        onClose={() => {
+          setShowModal(false);
+          router.push("/dashboard");
+        }}
+        durationSeconds={secondsPassed}
+        tasksCompleted={tasksDoneCount}
+        taskTitle={currentTask?.title}
       />
 
       <div className="max-w-md w-full text-center space-y-8 z-10">
@@ -160,11 +116,10 @@ export default function FocusPage() {
             Current Focus
           </span>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight text-foreground line-clamp-2">
-            {currentTask.title}
+            {currentTask?.title || "Free Flow"}
           </h1>
         </div>
 
-        {/* Timer Display */}
         <div className="relative group min-h-[160px] flex items-center justify-center">
           <div
             className={`font-mono font-bold tracking-tighter text-foreground tabular-nums transition-all ${
@@ -181,6 +136,7 @@ export default function FocusPage() {
                   onBlur={() => setIsEditing(false)}
                   onChange={handleManualInput}
                   onKeyDown={(e) => e.key === "Enter" && setIsEditing(false)}
+                  autoFocus
                 />
                 <span className="text-4xl text-muted font-sans font-medium">
                   min
@@ -197,13 +153,12 @@ export default function FocusPage() {
           </div>
         </div>
 
-        {/* Presets */}
         {!isActive && !isEditing && (
           <div className="flex flex-wrap justify-center gap-2 animate-in fade-in slide-in-from-top-2">
             {[15, 25, 45, 60].map((min) => (
               <button
                 key={min}
-                onClick={() => handleDurationChange(min)}
+                onClick={() => setDuration(min)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
                   initialTime === min * 60
                     ? "bg-primary text-background border-primary shadow-lg shadow-primary/20"
@@ -231,20 +186,20 @@ export default function FocusPage() {
         )}
 
         <div className="flex items-center justify-center gap-8 pt-6">
-          {/* RESET BUTTON */}
           <button
-            onClick={handleReset}
+            onClick={() => {
+              if (window.confirm("Reset timer?")) resetTimer();
+            }}
             className="p-4 rounded-full bg-surface text-muted hover:bg-red-500/10 hover:text-red-400 hover:scale-105 transition-all"
             title="Reset Timer"
           >
             <RotateCcw size={22} />
           </button>
 
-          {/* PLAY/PAUSE */}
           <button
             onClick={() => {
               if (isEditing) setIsEditing(false);
-              setIsActive(!isActive);
+              toggleTimer();
             }}
             className="p-7 rounded-full bg-primary text-background hover:scale-110 hover:shadow-xl hover:shadow-primary/30 active:scale-95 transition-all"
           >
@@ -255,7 +210,6 @@ export default function FocusPage() {
             )}
           </button>
 
-          {/* FINISH EARLY */}
           <button
             onClick={handleFinishEarly}
             className="p-4 rounded-full bg-surface text-muted hover:bg-green-500/10 hover:text-green-400 hover:scale-105 transition-all"
