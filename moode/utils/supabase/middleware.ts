@@ -39,7 +39,8 @@ export async function updateSession(request: NextRequest) {
 
   if (
     !user &&
-    (request.nextUrl.pathname.startsWith("/history") ||
+    (request.nextUrl.pathname.startsWith("/dashboard/history") ||
+      request.nextUrl.pathname.startsWith("/focus") ||
       request.nextUrl.pathname.startsWith("/settings"))
   ) {
     return NextResponse.redirect(new URL("/auth/login", request.url));

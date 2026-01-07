@@ -8,7 +8,6 @@ import DashboardHeader from "@/components/layout/DashboardHeader";
 import { createBrowserClient } from "@supabase/ssr";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useThemeEffect } from "@/hooks/useThemeEffect";
 
 export default function DashboardLayout({
   children,
@@ -17,8 +16,6 @@ export default function DashboardLayout({
 }) {
   const { fetchTasks } = useStore();
   const router = useRouter();
-
-  const { currentTheme } = useThemeEffect();
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -47,10 +44,7 @@ export default function DashboardLayout({
   }, [fetchTasks]);
 
   return (
-    <div
-      data-theme={currentTheme}
-      className="relative min-h-screen w-full flex flex-col overflow-hidden transition-colors duration-700 ease-in-out text-foreground"
-    >
+    <div className="relative min-h-screen w-full flex flex-col overflow-hidden text-foreground">
       <AuroraBackground />
       <SoundManager />
 

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import { toast } from "sonner";
-import { useStore } from "@/hooks/useStore";
+import { useTheme } from "next-themes";
 import {
   Monitor,
   Leaf,
@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 
 export default function DashboardHeader() {
-  const { theme, setTheme } = useStore();
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -28,6 +29,10 @@ export default function DashboardHeader() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const getUser = async () => {
@@ -83,39 +88,55 @@ export default function DashboardHeader() {
         <div className="flex items-center gap-4">
           {/* THEME SWITCHER */}
           <div className="flex gap-2">
-            <button
-              onClick={() => setTheme("focus")}
-              className={`p-2 rounded-full transition-all ${
-                theme === "focus"
-                  ? "bg-primary text-background"
-                  : "hover:bg-white/10"
-              }`}
-              title="Deep Focus"
-            >
-              <Monitor size={18} />
-            </button>
-            <button
-              onClick={() => setTheme("zen")}
-              className={`p-2 rounded-full transition-all ${
-                theme === "zen"
-                  ? "bg-primary text-background"
-                  : "hover:bg-white/10"
-              }`}
-              title="Zen Garden"
-            >
-              <Leaf size={18} />
-            </button>
-            <button
-              onClick={() => setTheme("sunset")}
-              className={`p-2 rounded-full transition-all ${
-                theme === "sunset"
-                  ? "bg-primary text-background"
-                  : "hover:bg-white/10"
-              }`}
-              title="Sunset Lofi"
-            >
-              <Sunset size={18} />
-            </button>
+            {!mounted ? (
+              <>
+                <div className="p-2 rounded-full bg-white/5 text-muted/20">
+                  <Monitor size={18} />
+                </div>
+                <div className="p-2 rounded-full bg-white/5 text-muted/20">
+                  <Leaf size={18} />
+                </div>
+                <div className="p-2 rounded-full bg-white/5 text-muted/20">
+                  <Sunset size={18} />
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setTheme("focus")}
+                  className={`p-2 rounded-full transition-all ${
+                    theme === "focus"
+                      ? "bg-primary text-background"
+                      : "hover:bg-white/10"
+                  }`}
+                  title="Deep Focus"
+                >
+                  <Monitor size={18} />
+                </button>
+                <button
+                  onClick={() => setTheme("zen")}
+                  className={`p-2 rounded-full transition-all ${
+                    theme === "zen"
+                      ? "bg-primary text-background"
+                      : "hover:bg-white/10"
+                  }`}
+                  title="Zen Garden"
+                >
+                  <Leaf size={18} />
+                </button>
+                <button
+                  onClick={() => setTheme("sunset")}
+                  className={`p-2 rounded-full transition-all ${
+                    theme === "sunset"
+                      ? "bg-primary text-background"
+                      : "hover:bg-white/10"
+                  }`}
+                  title="Sunset Lofi"
+                >
+                  <Sunset size={18} />
+                </button>
+              </>
+            )}
           </div>
 
           {user ? (

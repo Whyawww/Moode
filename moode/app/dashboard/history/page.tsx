@@ -15,7 +15,7 @@ export default function HistoryPage() {
   );
 
   return (
-    <div className="min-h-screen p-6 pt-24 max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen p-6 pt-8 max-w-5xl mx-auto space-y-8">
       <div className="flex items-center gap-4">
         <button
           onClick={() => router.push("/dashboard")}

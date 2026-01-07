@@ -1,25 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useStore } from "@/hooks/useStore";
+import React from "react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-export default function ThemeProvider({
+export function ThemeProvider({
   children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { theme } = useStore();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  if (!mounted) return <>{children}</>;
-
-  return <>{children}</>;
+  ...props
+}: React.ComponentProps<typeof NextThemesProvider>) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }
