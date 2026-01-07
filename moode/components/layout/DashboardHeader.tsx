@@ -155,7 +155,7 @@ export default function DashboardHeader() {
 
               {/* DROPDOWN MENU */}
               {isDropdownOpen && (
-                <div className="absolute right-0 top-full mt-3 w-48 bg-[#1a1a1a]/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
+                <div className="absolute right-0 top-full mt-3 w-56 bg-black/60 md:bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50 ring-1 ring-white/5">
                   <div className="px-4 py-3 border-b border-white/5 sm:hidden">
                     <p className="text-sm font-bold text-foreground truncate">
                       {user.user_metadata?.full_name}

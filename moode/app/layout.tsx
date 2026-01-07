@@ -37,12 +37,6 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
-  instagram: {
-    card: "summary_large_image",
-    title: "Moode - Aesthetic Focus Timer",
-    description: "Stop procrastinating. Start focusing.",
-    creator: "@jiw.codes",
-  },
   robots: {
     index: true,
     follow: true,
