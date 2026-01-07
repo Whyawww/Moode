@@ -6,9 +6,54 @@ import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const BASE_URL = "https://moode-six.vercel.app/";
+
 export const metadata: Metadata = {
-  title: "Moode",
-  description: "Focus shouldn't be boring.",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "Moode | Aesthetic Focus Timer & Ambient Sounds",
+    template: "Moode | %s",
+  },
+  description:
+    "Boost productivity with Moode. A minimalist Pomodoro timer mixed with ambient sounds (Rain, Cafe, Fire) to help you enter the flow state.",
+  keywords: [
+    "focus timer",
+    "pomodoro timer",
+    "ambient sounds",
+    "productivity app",
+    "study timer",
+    "lofi study",
+    "deep work",
+    "online timer",
+  ],
+  authors: [{ name: "Wahyu Aji", url: "https://github.com/Whyawww" }],
+  creator: "Wahyu Aji",
+  openGraph: {
+    title: "Moode - Focus Shouldn't Be Boring",
+    description:
+      "Enter flow state with ambient sounds and a distraction-free timer.",
+    url: BASE_URL,
+    siteName: "Moode",
+    locale: "en_US",
+    type: "website",
+  },
+  instagram: {
+    card: "summary_large_image",
+    title: "Moode - Aesthetic Focus Timer",
+    description: "Stop procrastinating. Start focusing.",
+    creator: "@jiw.codes",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export const viewport: Viewport = {
