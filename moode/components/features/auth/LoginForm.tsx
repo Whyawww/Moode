@@ -5,6 +5,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const GoogleIcon = () => (
   <svg
@@ -95,9 +96,24 @@ export default function LoginForm() {
                 </>
               )}
             </button>
-
             <p className="text-xs text-center text-muted/60 px-4 leading-relaxed">
-              By continuing, you agree to Moode&apos;s Terms and Privacy Policy.
+              By continuing, you agree to Moode&apos;s{" "}
+              <Link
+                href="/terms"
+                className="underline font-bold decoration-muted/40 hover:text-foreground hover:decoration-foreground transition-all"
+                target="_blank"
+              >
+                Terms
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/privacy"
+                className="underline font-black decoration-muted/40 hover:text-foreground hover:decoration-foreground transition-all"
+                target="_blank"
+              >
+                Privacy Policy
+              </Link>
+              .
             </p>
           </div>
         </div>
