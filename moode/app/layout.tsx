@@ -71,7 +71,7 @@ export default function RootLayout({
           attribute="data-theme"
           defaultTheme="focus"
           enableSystem={false}
-          themes={["focus", "zen", "sunset"]}
+          themes={["focus", "zen", "sunset", "daylight", "latte"]}
         >
           {children}
           <Analytics />

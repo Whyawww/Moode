@@ -11,6 +11,8 @@ import {
   Monitor,
   Leaf,
   Sunset,
+  Sun,
+  Coffee,
   History,
   LogOut,
   User,
@@ -134,6 +136,29 @@ export default function DashboardHeader() {
                   title="Sunset Lofi"
                 >
                   <Sunset size={18} />
+                </button>
+                <button
+                  onClick={() => setTheme("daylight")}
+                  className={`p-2 rounded-full transition-all ${
+                    theme === "daylight"
+                      ? "bg-primary text-background"
+                      : "hover:bg-black/5"
+                  }`}
+                  title="Daylight Mode"
+                >
+                  <Sun size={18} />
+                </button>
+
+                <button
+                  onClick={() => setTheme("latte")}
+                  className={`p-2 rounded-full transition-all ${
+                    theme === "latte"
+                      ? "bg-primary text-background"
+                      : "hover:bg-black/5"
+                  }`}
+                  title="Latte Cafe"
+                >
+                  <Coffee size={18} />
                 </button>
               </>
             )}

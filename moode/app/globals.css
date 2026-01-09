@@ -64,6 +64,24 @@
     --muted: #d8b4fe;
   }
 
+  /* --- DAYLIGHT THEME (High Contrast / Productivity) --- */
+  :root[data-theme="daylight"] {
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --primary: #0284c7;
+    --surface: #e2e8f0;
+    --muted: #64748b;
+  }
+
+  /* --- LATTE THEME (Warm / Cafe Vibes) --- */
+  :root[data-theme="latte"] {
+    --background: #fffbeb;
+    --foreground: #451a03;
+    --primary: #d97706;
+    --surface: #fde68a;
+    --muted: #92400e;
+  }
+
   /* STYLE GLOBAL BODY */
   body {
     max-width: 100vw;
