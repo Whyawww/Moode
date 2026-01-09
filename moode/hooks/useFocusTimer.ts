@@ -1,16 +1,22 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  requestNotificationPermission,
+  sendNotification,
+} from "../utils/notification";
 
-export function useFocusTimer(defaultMinutes: number = 25) {
+export function useFocusTimer(
+  defaultMinutes: number = 25,
+  onFinish?: () => void
+) {
   const [initialTime, setInitialTime] = useState(defaultMinutes * 60);
   const [timeLeft, setTimeLeft] = useState(defaultMinutes * 60);
   const [isActive, setIsActive] = useState(false);
   const endTimeRef = useRef<number | null>(null);
 
+  const onFinishRef = useRef(onFinish);
   useEffect(() => {
-    if ("Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission();
-    }
-  }, []);
+    onFinishRef.current = onFinish;
+  }, [onFinish]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -28,11 +34,14 @@ export function useFocusTimer(defaultMinutes: number = 25) {
           setTimeLeft(0);
           setIsActive(false);
           endTimeRef.current = null;
-          if (
-            "Notification" in window &&
-            Notification.permission === "granted"
-          ) {
-            new Notification("Moode Focus", { body: "Session Complete! 🎉" });
+
+          sendNotification(
+            "Focus Complete! 🎉",
+            "Great job! Take a short break."
+          );
+
+          if (onFinishRef.current) {
+            onFinishRef.current();
           }
         } else {
           setTimeLeft(remaining);
@@ -45,7 +54,12 @@ export function useFocusTimer(defaultMinutes: number = 25) {
     return () => clearInterval(interval);
   }, [isActive, timeLeft]);
 
-  const toggleTimer = () => setIsActive(!isActive);
+  const toggleTimer = async () => {
+    if (!isActive) {
+      await requestNotificationPermission();
+    }
+    setIsActive(!isActive);
+  };
 
   const resetTimer = () => {
     setIsActive(false);
