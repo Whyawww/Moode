@@ -16,7 +16,8 @@ import {
   History,
   LogOut,
   User,
-  ChevronDown,
+  Palette,
+  Check,
 } from "lucide-react";
 
 export default function DashboardHeader() {
@@ -24,8 +25,25 @@ export default function DashboardHeader() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [isUserOpen, setIsUserOpen] = useState(false);
+  const [isThemeOpen, setIsThemeOpen] = useState(false);
+
+  const userDropdownRef = useRef<HTMLDivElement>(null);
+  const themeDropdownRef = useRef<HTMLDivElement>(null);
+
+  const themeOptions = [
+    { id: "focus", label: "Deep Focus", icon: Monitor, color: "text-blue-400" },
+    { id: "zen", label: "Zen Garden", icon: Leaf, color: "text-green-400" },
+    {
+      id: "sunset",
+      label: "Sunset Lofi",
+      icon: Sunset,
+      color: "text-purple-400",
+    },
+    { id: "daylight", label: "Daylight", icon: Sun, color: "text-sky-500" },
+    { id: "latte", label: "Latte Cafe", icon: Coffee, color: "text-amber-600" },
+  ];
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,7 +52,7 @@ export default function DashboardHeader() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+  }, [setMounted]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -45,7 +63,6 @@ export default function DashboardHeader() {
     };
     getUser();
 
-    // Listen auth change
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -54,12 +71,19 @@ export default function DashboardHeader() {
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        userDropdownRef.current &&
+        !userDropdownRef.current.contains(event.target as Node)
       ) {
-        setIsDropdownOpen(false);
+        setIsUserOpen(false);
+      }
+      if (
+        themeDropdownRef.current &&
+        !themeDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsThemeOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
@@ -69,7 +93,7 @@ export default function DashboardHeader() {
   }, []);
 
   const handleLogout = async () => {
-    setIsDropdownOpen(false);
+    setIsUserOpen(false);
     toast.success("See you next time! 👋");
     await supabase.auth.signOut();
     router.push("/");
@@ -77,101 +101,79 @@ export default function DashboardHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
-      <div className="max-w-3xl mx-auto backdrop-blur-md bg-surface/30 border border-white/10 rounded-full px-6 py-3 flex items-center justify-between shadow-lg">
-        <Image
-          src="/moode.png"
-          alt="Moode"
-          width={120}
-          height={30}
-          className="object-contain"
-          priority
-        />
-        <div className="flex items-center gap-4">
-          {/* THEME SWITCHER */}
-          <div className="flex gap-2">
-            {!mounted ? (
-              <>
-                <div className="p-2 rounded-full bg-white/5 text-muted/20">
-                  <Monitor size={18} />
-                </div>
-                <div className="p-2 rounded-full bg-white/5 text-muted/20">
-                  <Leaf size={18} />
-                </div>
-                <div className="p-2 rounded-full bg-white/5 text-muted/20">
-                  <Sunset size={18} />
-                </div>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => setTheme("focus")}
-                  className={`p-2 rounded-full transition-all ${
-                    theme === "focus"
-                      ? "bg-primary text-background"
-                      : "hover:bg-white/10"
-                  }`}
-                  title="Deep Focus"
-                >
-                  <Monitor size={18} />
-                </button>
-                <button
-                  onClick={() => setTheme("zen")}
-                  className={`p-2 rounded-full transition-all ${
-                    theme === "zen"
-                      ? "bg-primary text-background"
-                      : "hover:bg-white/10"
-                  }`}
-                  title="Zen Garden"
-                >
-                  <Leaf size={18} />
-                </button>
-                <button
-                  onClick={() => setTheme("sunset")}
-                  className={`p-2 rounded-full transition-all ${
-                    theme === "sunset"
-                      ? "bg-primary text-background"
-                      : "hover:bg-white/10"
-                  }`}
-                  title="Sunset Lofi"
-                >
-                  <Sunset size={18} />
-                </button>
-                <button
-                  onClick={() => setTheme("daylight")}
-                  className={`p-2 rounded-full transition-all ${
-                    theme === "daylight"
-                      ? "bg-primary text-background"
-                      : "hover:bg-black/5"
-                  }`}
-                  title="Daylight Mode"
-                >
-                  <Sun size={18} />
-                </button>
+    <header className="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-6">
+      <div className="max-w-3xl mx-auto backdrop-blur-md bg-surface/30 border border-white/10 rounded-full px-4 py-2 md:px-6 md:py-3 flex items-center justify-between shadow-lg">
+        <div className="relative w-24 h-8">
+          <Image
+            src="/moode.png"
+            alt="Moode"
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
 
-                <button
-                  onClick={() => setTheme("latte")}
-                  className={`p-2 rounded-full transition-all ${
-                    theme === "latte"
-                      ? "bg-primary text-background"
-                      : "hover:bg-black/5"
-                  }`}
-                  title="Latte Cafe"
-                >
-                  <Coffee size={18} />
-                </button>
-              </>
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* --- THEME DROPDOWN SWITCHER --- */}
+          <div className="relative" ref={themeDropdownRef}>
+            {!mounted ? (
+              <div className="w-8 h-8 rounded-full bg-white/5 animate-pulse" />
+            ) : (
+              <button
+                onClick={() => setIsThemeOpen(!isThemeOpen)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all border ${
+                  isThemeOpen
+                    ? "bg-primary/20 text-primary border-primary/20"
+                    : "bg-transparent text-muted hover:text-foreground hover:bg-white/5 border-transparent"
+                }`}
+                title="Change Theme"
+              >
+                <Palette size={18} />
+                <span className="text-xs font-bold">Theme</span>
+              </button>
+            )}
+
+            {/* Dropdown Content */}
+            {isThemeOpen && (
+              <div className="absolute right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 top-full mt-3 w-48 bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-200 z-50 ring-1 ring-white/5">
+                {themeOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => {
+                      setTheme(option.id);
+                      setIsThemeOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                      theme === option.id
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-muted hover:text-foreground hover:bg-white/5"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <option.icon
+                        size={16}
+                        className={
+                          theme === option.id ? "text-primary" : option.color
+                        }
+                      />
+                      <span>{option.label}</span>
+                    </div>
+                    {theme === option.id && <Check size={14} />}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 
+          {/* --- USER PROFILE DROPDOWN --- */}
           {user ? (
             <div
-              className="relative pl-4 border-l border-white/10"
-              ref={dropdownRef}
+              className="relative pl-2 md:pl-4 border-l border-white/10"
+              ref={userDropdownRef}
             >
               <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                onClick={() => setIsUserOpen(!isUserOpen)}
+                className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity"
               >
                 <div className="text-right hidden sm:block">
                   <p className="text-xs font-bold text-foreground max-w-[100px] truncate">
@@ -191,17 +193,10 @@ export default function DashboardHeader() {
                     <User size={18} className="m-auto text-muted" />
                   )}
                 </div>
-                <ChevronDown
-                  size={14}
-                  className={`text-muted transition-transform duration-200 ${
-                    isDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
               </button>
 
-              {/* DROPDOWN MENU */}
-              {isDropdownOpen && (
-                <div className="absolute right-0 top-full mt-3 w-56 bg-black/60 md:bg-transparent backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50 ring-1 ring-white/5">
+              {isUserOpen && (
+                <div className="absolute right-0 top-full mt-3 w-56 bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50 ring-1 ring-white/5">
                   <div className="px-4 py-3 border-b border-white/5 sm:hidden">
                     <p className="text-sm font-bold text-foreground truncate">
                       {user.user_metadata?.full_name}
@@ -211,8 +206,8 @@ export default function DashboardHeader() {
 
                   <Link
                     href="/dashboard/history"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-foreground hover:bg-white/5 transition-colors"
+                    onClick={() => setIsUserOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground/80 hover:text-white hover:bg-white/5 transition-colors"
                   >
                     <History size={16} className="text-primary" />
                     History
@@ -220,7 +215,7 @@ export default function DashboardHeader() {
 
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-left"
                   >
                     <LogOut size={16} />
                     Log Out

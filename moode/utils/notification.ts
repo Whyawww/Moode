@@ -21,7 +21,7 @@ export const sendNotification = (title: string, body: string) => {
           icon: "/icon.png",
           vibrate: [200, 100, 200],
           tag: "focus-complete",
-        });
+        } as NotificationOptions & { vibrate?: number[] });
       });
     } else {
       new Notification(title, {
