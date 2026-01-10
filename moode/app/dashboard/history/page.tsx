@@ -7,6 +7,7 @@ import { ArrowLeft, CalendarDays } from "lucide-react";
 import HistoryCalendar from "@/components/features/history/HistoryCalender";
 import DailyNote from "@/components/features/history/DailyNotes";
 import HistoryTaskList from "@/components/features/history/HistoryTaskList";
+import StreakHeatmap from "@/components/features/gamification/StreakHeatmap";
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -29,6 +30,10 @@ export default function HistoryPage() {
           </h1>
           <p className="text-muted">Track your consistency & reflections.</p>
         </div>
+      </div>
+
+      <div className="w-full animate-in fade-in slide-in-from-bottom-2 duration-700">
+        <StreakHeatmap />
       </div>
 
       <div className="grid md:grid-cols-[350px_1fr] gap-8 items-start">

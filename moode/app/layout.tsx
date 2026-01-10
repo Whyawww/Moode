@@ -27,8 +27,8 @@ export const metadata: Metadata = {
     "deep work",
     "online timer",
   ],
-  authors: [{ name: "Wahyu Aji", url: "https://github.com/Whyawww" }],
-  creator: "Wahyu Aji",
+  authors: [{ name: "Wahyu Aji Nusantara", url: "https://github.com/Whyawww", }],
+  creator: "Wahyu Aji Nusantara",
   openGraph: {
     title: "Moode - Focus Shouldn't Be Boring",
     description:

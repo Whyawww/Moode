@@ -1,13 +1,14 @@
 import { create } from "zustand";
 import { createBrowserClient } from "@supabase/ssr";
 import { toast } from "sonner";
+import { startOfYear, format, subDays } from "date-fns";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-type ThemeType = "focus" | "zen" | "sunset";
+type ThemeType = "focus" | "zen" | "sunset" | "daylight" | "latte";
 
 interface AudioState {
   rain: number;
@@ -20,6 +21,12 @@ export interface Task {
   title: string;
   completed: boolean;
   completedAt?: Date;
+}
+
+export interface ActivityLog {
+  date: string;
+  minutes: number;
+  count: number;
 }
 
 interface AppState {
@@ -38,6 +45,11 @@ interface AppState {
   currentNote: string;
   fetchNote: (date: Date) => Promise<void>;
   saveNote: (date: Date, content: string) => Promise<void>;
+
+  activityLogs: ActivityLog[];
+  currentStreak: number;
+  fetchActivityLogs: () => Promise<void>;
+  logActivity: (minutes: number) => Promise<void>;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -52,9 +64,11 @@ export const useStore = create<AppState>((set, get) => ({
   tasks: [],
   isLoading: false,
 
+  activityLogs: [],
+  currentStreak: 0,
+
   fetchTasks: async () => {
     set({ isLoading: true });
-
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -68,9 +82,7 @@ export const useStore = create<AppState>((set, get) => ({
       .select("*")
       .order("created_at", { ascending: true });
 
-    if (error) {
-      console.error("Gagal ambil tasks:", error);
-    } else {
+    if (!error && data) {
       const formattedTasks: Task[] = data.map((t) => ({
         id: t.id,
         title: t.title,
@@ -88,7 +100,6 @@ export const useStore = create<AppState>((set, get) => ({
       toast.warning("Focus limit reached (7 tasks max).");
       return;
     }
-
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -104,7 +115,6 @@ export const useStore = create<AppState>((set, get) => ({
       .single();
 
     if (error) {
-      console.error("Error nambah task:", error);
       toast.error("Failed to add task.");
     } else if (data) {
       const newTask: Task = {
@@ -112,25 +122,16 @@ export const useStore = create<AppState>((set, get) => ({
         title: data.title,
         completed: data.completed,
       };
-
-      set((state) => ({
-        tasks: [...state.tasks, newTask],
-      }));
+      set((state) => ({ tasks: [...state.tasks, newTask] }));
       toast.success("Task added to flow!");
     }
   },
 
   removeTask: async (id) => {
     const previousTasks = get().tasks;
-
-    set((state) => ({
-      tasks: state.tasks.filter((t) => t.id !== id),
-    }));
-
+    set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) }));
     const { error } = await supabase.from("tasks").delete().eq("id", id);
-
     if (error) {
-      console.error("Gagal hapus:", error);
       set({ tasks: previousTasks });
       toast.error("Failed to delete task.");
     } else {
@@ -142,6 +143,20 @@ export const useStore = create<AppState>((set, get) => ({
     const newStatus = !currentStatus;
     const newCompletedAt = newStatus ? new Date().toISOString() : null;
 
+    set((state) => ({
+      tasks: state.tasks.map((t) =>
+        t.id === id
+          ? {
+              ...t,
+              completed: newStatus,
+              completedAt: newCompletedAt
+                ? new Date(newCompletedAt)
+                : undefined,
+            }
+          : t
+      ),
+    }));
+
     const { error } = await supabase
       .from("tasks")
       .update({
@@ -150,45 +165,26 @@ export const useStore = create<AppState>((set, get) => ({
       })
       .eq("id", id);
 
-    if (!error) {
-      set((state) => ({
-        tasks: state.tasks.map((t) =>
-          t.id === id
-            ? {
-                ...t,
-                completed: newStatus,
-                completedAt: newCompletedAt
-                  ? new Date(newCompletedAt)
-                  : undefined,
-              }
-            : t
-        ),
-      }));
+    if (error) {
+      toast.error("Sync failed");
     }
   },
 
   currentNote: "",
-
   fetchNote: async (date) => {
     set({ currentNote: "" });
-
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return;
 
     const dateString = date.toLocaleDateString("en-CA");
-
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("daily_notes")
       .select("content")
       .eq("user_id", user.id)
       .eq("date", dateString)
       .single();
-
-    if (error && error.code !== "PGRST116") {
-      console.error("Error fetching note:", error);
-    }
 
     if (data) {
       set({ currentNote: data.content });
@@ -203,23 +199,95 @@ export const useStore = create<AppState>((set, get) => ({
       toast.error("Login to save notes");
       return;
     }
-
     const dateString = date.toLocaleDateString("en-CA");
-
     set({ currentNote: content });
 
-    const { error } = await supabase.from("daily_notes").upsert(
+    await supabase
+      .from("daily_notes")
+      .upsert(
+        { user_id: user.id, date: dateString, content: content },
+        { onConflict: "user_id, date" }
+      );
+  },
+
+  fetchActivityLogs: async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("activity_logs")
+      .select("date, minutes_focused")
+      .eq("user_id", user.id)
+      .gte("date", format(startOfYear(new Date()), "yyyy-MM-dd"));
+
+    if (data) {
+      const logs: ActivityLog[] = data.map((item) => ({
+        date: item.date,
+        minutes: item.minutes_focused,
+        count: 1,
+      }));
+
+      const sortedLogs = logs.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+
+      let streak = 0;
+      const today = new Date();
+      const todayStr = format(today, "yyyy-MM-dd");
+      const yesterdayStr = format(subDays(today, 1), "yyyy-MM-dd");
+
+      const hasActivityToday = sortedLogs.some((l) => l.date === todayStr);
+      const hasActivityYesterday = sortedLogs.some(
+        (l) => l.date === yesterdayStr
+      );
+
+      if (hasActivityToday || hasActivityYesterday) {
+        let currentDateCheck = hasActivityToday ? today : subDays(today, 1);
+
+        for (let i = 0; i < sortedLogs.length; i++) {
+          const logDate = sortedLogs[i].date;
+          if (logDate === format(currentDateCheck, "yyyy-MM-dd")) {
+            streak++;
+            currentDateCheck = subDays(currentDateCheck, 1);
+          } else {
+            if (new Date(logDate) < currentDateCheck) break;
+          }
+        }
+      } else {
+        streak = 0;
+      }
+
+      set({ activityLogs: logs, currentStreak: streak });
+    }
+  },
+
+  logActivity: async (minutes) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const todayStr = format(new Date(), "yyyy-MM-dd");
+
+    const existingLog = get().activityLogs.find((l) => l.date === todayStr);
+    const currentMinutes = existingLog ? existingLog.minutes : 0;
+    const newMinutes = currentMinutes + minutes;
+
+    const { error } = await supabase.from("activity_logs").upsert(
       {
         user_id: user.id,
-        date: dateString,
-        content: content,
+        date: todayStr,
+        minutes_focused: newMinutes,
       },
       { onConflict: "user_id, date" }
     );
 
-    if (error) {
-      console.error("Gagal save note:", error);
-      toast.error("Failed to save note");
+    if (!error) {
+      get().fetchActivityLogs();
+    } else {
+      console.error("Failed to log activity:", error);
     }
   },
 }));

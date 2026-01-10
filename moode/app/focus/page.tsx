@@ -26,7 +26,7 @@ function useDocumentTitle(title: string) {
 
 export default function FocusPage() {
   const router = useRouter();
-  const { tasks, toggleTask } = useStore();
+  const { tasks, toggleTask, logActivity } = useStore();
   const [isEditing, setIsEditing] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -42,12 +42,19 @@ export default function FocusPage() {
   const handleSessionComplete = async (isEarlyFinish = false) => {
     const taskTitle = currentTask?.title || "Free Flow";
     const passedTime = initialTime - timeLeft;
+    const minutesFocused = Math.floor(passedTime / 60);
 
     setSessionSummary({
       secondsPassed: passedTime > 0 ? passedTime : 0,
       tasksCompleted: currentTask ? 1 : 0,
       finishedTaskTitle: taskTitle,
     });
+
+    if (minutesFocused > 0) {
+      logActivity(minutesFocused).catch((err) =>
+        console.error("Log failed:", err)
+      );
+    }
 
     if (currentTask && !currentTask.completed) {
       try {
@@ -79,7 +86,6 @@ export default function FocusPage() {
     ? `(${formatTime(timeLeft)}) ${currentTask?.title || "Focus"}`
     : "Moode | Focus Room";
   useDocumentTitle(pageTitle);
-
 
   const handleFinishEarly = async () => {
     if (isActive) toggleTimer();
