@@ -37,7 +37,7 @@ export default function HistoryPage() {
       </div>
 
       <div className="grid md:grid-cols-[350px_1fr] gap-8 items-start">
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col gap-6 ">
           <HistoryCalendar
             selectedDate={selectedDate}
             onSelect={setSelectedDate}
@@ -46,7 +46,9 @@ export default function HistoryPage() {
           <DailyNote date={selectedDate} />
         </div>
 
-        <HistoryTaskList date={selectedDate} />
+        <div className="w-full max-h-[620px] overflow-y-auto pr-2 custom-scrollbar rounded-2xl">
+          <HistoryTaskList date={selectedDate} />
+        </div>
       </div>
     </div>
   );
