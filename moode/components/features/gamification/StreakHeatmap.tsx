@@ -15,11 +15,11 @@ const CONFIG = {
 };
 
 export default function StreakHeatmap() {
-  const { activityLogs, fetchActivityLogs, currentStreak } = useStore();
+  const { activityLogs, fetchGamificationData, currentStreak } = useStore();
 
   useEffect(() => {
-    fetchActivityLogs();
-  }, [fetchActivityLogs]);
+    fetchGamificationData();
+  }, [fetchGamificationData]);
 
   // Memoization
   const dates = useMemo(() => {

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import QueryProvider from "@/components/providers/QueryProviders";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     "deep work",
     "online timer",
   ],
-  authors: [{ name: "Wahyu Aji Nusantara", url: "https://github.com/Whyawww", }],
+  authors: [{ name: "Wahyu Aji Nusantara", url: "https://github.com/Whyawww" }],
   creator: "Wahyu Aji Nusantara",
   openGraph: {
     title: "Moode - Focus Shouldn't Be Boring",
@@ -67,16 +68,18 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
-        <ThemeProvider
-          attribute="data-theme"
-          defaultTheme="focus"
-          enableSystem={false}
-          themes={["focus", "zen", "sunset", "daylight", "latte"]}
-        >
-          {children}
-          <Analytics />
-          <Toaster position="top-center" richColors theme="dark" />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="data-theme"
+            defaultTheme="focus"
+            enableSystem={false}
+            themes={["focus", "zen", "sunset", "daylight", "latte"]}
+          >
+            {children}
+            <Analytics />
+            <Toaster position="top-center" richColors theme="dark" />
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

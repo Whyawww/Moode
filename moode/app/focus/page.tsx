@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, KeyboardEvent, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/hooks/useStore";
 import { useFocusTimer } from "@/hooks/useFocusTimer";
+import { useDashboardTasks, useTaskMutations } from "@/hooks/queries/useTasks";
 import { toast } from "sonner";
 import {
   Pause,
@@ -26,7 +27,9 @@ function useDocumentTitle(title: string) {
 
 export default function FocusPage() {
   const router = useRouter();
-  const { tasks, toggleTask, logActivity } = useStore();
+  const { logActivity } = useStore();
+  const { data: tasks } = useDashboardTasks();
+  const { toggleTaskMutation } = useTaskMutations();
   const [isEditing, setIsEditing] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -37,16 +40,33 @@ export default function FocusPage() {
   });
 
   const inputRef = useRef<HTMLInputElement>(null);
-
   const currentTask = tasks?.find((t) => !t.completed);
+  const taskRef = useRef(currentTask);
+  useEffect(() => {
+    taskRef.current = currentTask;
+  }, [currentTask]);
+  const timerRef = useRef({ initialTime: 25 * 60, timeLeft: 25 * 60 });
+
   const handleSessionComplete = async (isEarlyFinish = false) => {
-    const taskTitle = currentTask?.title || "Free Flow";
-    const passedTime = initialTime - timeLeft;
-    const minutesFocused = Math.floor(passedTime / 60);
+    const { initialTime, timeLeft } = timerRef.current;
+    const safeCurrentTask = taskRef.current;
+
+    const taskTitle = safeCurrentTask?.title || "Free Flow";
+
+    let passedTime = initialTime - timeLeft;
+
+    if (passedTime <= 0 && isEarlyFinish) {
+      passedTime = 1;
+    }
+
+    const rawMinutes = passedTime / 60;
+
+    const minutesFocused =
+      rawMinutes > 0 && rawMinutes < 1 ? 1 : Math.floor(rawMinutes);
 
     setSessionSummary({
       secondsPassed: passedTime > 0 ? passedTime : 0,
-      tasksCompleted: currentTask ? 1 : 0,
+      tasksCompleted: safeCurrentTask ? 1 : 0,
       finishedTaskTitle: taskTitle,
     });
 
@@ -56,9 +76,12 @@ export default function FocusPage() {
       );
     }
 
-    if (currentTask && !currentTask.completed) {
+    if (safeCurrentTask && !safeCurrentTask.completed) {
       try {
-        await toggleTask(currentTask.id, false);
+        await toggleTaskMutation.mutateAsync({
+          id: safeCurrentTask.id,
+          status: true,
+        });
         toast.success(`Task "${taskTitle}" completed! 🎉`);
       } catch (error) {
         toast.error("Failed to update task status.");
@@ -82,14 +105,18 @@ export default function FocusPage() {
     formatTime,
   } = useFocusTimer(25, () => handleSessionComplete(false));
 
+  useEffect(() => {
+    timerRef.current = { initialTime, timeLeft };
+  }, [initialTime, timeLeft]);
+
   const pageTitle = isActive
     ? `(${formatTime(timeLeft)}) ${currentTask?.title || "Focus"}`
     : "Moode | Focus Room";
   useDocumentTitle(pageTitle);
 
   const handleFinishEarly = async () => {
-    if (isActive) toggleTimer();
     await handleSessionComplete(true);
+    if (isActive) toggleTimer();
   };
 
   const handleManualInput = (e: ChangeEvent<HTMLInputElement>) => {

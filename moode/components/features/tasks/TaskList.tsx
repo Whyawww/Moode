@@ -1,20 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { useStore, Task } from "@/hooks/useStore";
+import { useDashboardTasks, useTaskMutations } from "@/hooks/queries/useTasks";
+import { Task } from "@/hooks/useStore";
 import TaskListSkeleton from "@/components/providers/TaskListSkeleton";
 import { Plus, X, Play, Circle, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function TaskList() {
-  const { tasks, addTask, removeTask, toggleTask } = useStore();
-  const [inputValue, setInputValue] = useState("");
   const router = useRouter();
-  const isLoading = tasks === null;
-  if (isLoading) {
-    return <TaskListSkeleton />;
-  }
+  const [inputValue, setInputValue] = useState("");
+
+  const { data: tasks, isLoading, isError } = useDashboardTasks();
+
+  const { addTaskMutation, toggleTaskMutation, deleteTaskMutation } =
+    useTaskMutations();
+
+  // Handle Loading & Error
+  if (isLoading) return <TaskListSkeleton />;
+  if (isError)
+    return <div className="p-6 text-red-400">Failed to load tasks.</div>;
+
+  const safeTasks = tasks || [];
 
   const isToday = (date: Date | undefined) => {
     if (!date) return false;
@@ -26,8 +35,8 @@ export default function TaskList() {
     );
   };
 
-  const activeTasks = tasks.filter((t) => !t.completed);
-  const completedTasks = tasks.filter((t) => {
+  const activeTasks = safeTasks.filter((t) => !t.completed);
+  const completedTasks = safeTasks.filter((t) => {
     return t.completed && t.completedAt && isToday(new Date(t.completedAt));
   });
 
@@ -36,14 +45,20 @@ export default function TaskList() {
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim() || isFull) return;
-    addTask(inputValue);
-    setInputValue("");
+    if (!inputValue.trim()) return;
+
+    if (isFull) {
+      toast.warning("Focus limit reached (7 tasks max).");
+      return;
+    }
+
+    addTaskMutation.mutate(inputValue, {
+      onSuccess: () => setInputValue(""),
+    });
   };
 
   return (
     <div className="w-full backdrop-blur-xl bg-surface/40 border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col h-full min-h-[500px]">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-bold tracking-tight text-foreground">
@@ -75,12 +90,12 @@ export default function TaskList() {
               ? "Finish a task to add more..."
               : "Type the task you want to complete"
           }
-          disabled={isFull}
+          disabled={isFull || addTaskMutation.isPending} // Disable pas loading
           className="w-full bg-surface/50 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         />
         <button
           type="submit"
-          disabled={!inputValue.trim() || isFull}
+          disabled={!inputValue.trim() || isFull || addTaskMutation.isPending}
           className="absolute right-2 top-2 p-1.5 bg-primary/20 text-primary rounded-lg hover:bg-primary hover:text-background disabled:opacity-0 transition-all"
         >
           <Plus size={16} />
@@ -89,7 +104,6 @@ export default function TaskList() {
 
       <div className="flex-1 overflow-y-auto pr-2 space-y-8 custom-scrollbar">
         <LayoutGroup>
-          {/* ACTIVE TASKS CONTAINER */}
           <div className="space-y-3">
             <AnimatePresence mode="popLayout">
               {activeTasks.length === 0 && completedTasks.length === 0 && (
@@ -106,14 +120,16 @@ export default function TaskList() {
                 <TaskItem
                   key={task.id}
                   task={task}
-                  toggle={toggleTask}
-                  remove={removeTask}
+                  toggle={(id, status) =>
+                    toggleTaskMutation.mutate({ id, status })
+                  }
+                  remove={(id) => deleteTaskMutation.mutate(id)}
                 />
               ))}
             </AnimatePresence>
           </div>
 
-          {/* COMPLETED TASKS CONTAINER */}
+          {/* COMPLETED SECTION */}
           {completedTasks.length > 0 && (
             <div className="pt-4">
               <div className="flex items-center gap-2 mb-3 text-xs font-bold text-muted uppercase tracking-wider opacity-60">
@@ -128,8 +144,10 @@ export default function TaskList() {
                     <TaskItem
                       key={task.id}
                       task={task}
-                      toggle={toggleTask}
-                      remove={removeTask}
+                      toggle={(id, status) =>
+                        toggleTaskMutation.mutate({ id, status })
+                      }
+                      remove={(id) => deleteTaskMutation.mutate(id)}
                     />
                   ))}
                 </AnimatePresence>
@@ -139,7 +157,6 @@ export default function TaskList() {
         </LayoutGroup>
       </div>
 
-      {/* Hanya muncul kalau ada Active Task */}
       <div className="mt-6 pt-6 border-t border-white/5">
         <button
           disabled={activeTasks.length === 0}
