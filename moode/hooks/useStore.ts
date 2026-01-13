@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createBrowserClient } from "@supabase/ssr";
 import { toast } from "sonner";
 import { startOfYear, format, subDays } from "date-fns";
+import { logger } from "@/utils/logger";
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -287,7 +288,7 @@ export const useStore = create<AppState>((set, get) => ({
     if (!error) {
       get().fetchActivityLogs();
     } else {
-      console.error("Failed to log activity:", error);
+      logger.error("Failed to log activity", error);
     }
   },
 }));
