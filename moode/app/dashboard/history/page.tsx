@@ -33,7 +33,10 @@ export default function HistoryPage() {
       </div>
 
       <div className="w-full animate-in fade-in slide-in-from-bottom-2 duration-700">
-        <StreakHeatmap />
+        <StreakHeatmap
+          selectedDate={selectedDate}
+          onDateSelect={setSelectedDate}
+        />
       </div>
 
       <div className="grid md:grid-cols-[350px_1fr] gap-8 items-start">
