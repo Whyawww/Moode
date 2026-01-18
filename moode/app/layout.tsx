@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import QueryProvider from "@/components/providers/QueryProviders";
+import SWRegister from "@/components/pwa/SWRegister";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -75,6 +76,7 @@ export default function RootLayout({
             enableSystem={false}
             themes={["focus", "zen", "sunset", "daylight", "latte"]}
           >
+            <SWRegister />
             {children}
             <Analytics />
             <Toaster position="top-center" richColors theme="dark" />

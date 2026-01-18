@@ -33,7 +33,7 @@ export default function Navbar() {
         {supportsPWA && (
           <button
             onClick={installApp}
-            className="hidden md:flex items-center gap-2 px-4 py-2 text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded-full hover:bg-primary hover:text-background transition-all"
+            className="md:flex items-center gap-2 px-4 py-2 text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded-full hover:bg-primary hover:text-background transition-all"
           >
             <Download size={14} />
             Install App
