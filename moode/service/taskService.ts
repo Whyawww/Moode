@@ -10,6 +10,29 @@ const supabase = createBrowserClient(
 export const taskService = {
   // Fetch Dashboard
   getDashboardTasks: async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // DEMO MODE
+    if (!user) {
+      return [
+        {
+          id: "demo-1",
+          title: "👋 Welcome to Demo Mode!",
+          completed: false,
+          created_at: new Date().toISOString(),
+          user_id: "demo",
+        },
+        {
+          id: "demo-2",
+          title: "Try the ambient sounds 🎧",
+          completed: false,
+          created_at: new Date().toISOString(),
+          user_id: "demo",
+        }
+      ];
+    }
+
+    // User Login
     const todayISO = startOfDay(new Date()).toISOString();
     const { data, error } = await supabase
       .from("tasks")
@@ -39,6 +62,8 @@ export const taskService = {
 
   // Fetch History
   getHistoryTasks: async ({ pageParam = 0 }) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
     const pageSize = 20;
     const from = pageParam * pageSize;
     const to = from + pageSize - 1;
@@ -66,6 +91,8 @@ export const taskService = {
   },
 
   updateTaskStatus: async (id: string, completed: boolean) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("DEMO_MODE");
     const completedAt = completed ? new Date().toISOString() : null;
     const { data, error } = await supabase
       .from("tasks")
@@ -79,6 +106,8 @@ export const taskService = {
   },
 
   deleteTask: async (id: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("DEMO_MODE");
     const { error } = await supabase.from("tasks").delete().eq("id", id);
     if (error) throw error;
     return id;

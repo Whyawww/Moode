@@ -36,7 +36,6 @@ export const gamificationService = {
       .from("activity_logs")
       .select("date, minutes_focused")
       .eq("user_id", user.id)
-      // Ambil data tahun ini
       .gte(
         "date",
         new Date(new Date().getFullYear(), 0, 1).toLocaleDateString("en-CA")

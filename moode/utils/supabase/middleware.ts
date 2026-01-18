@@ -33,7 +33,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-
   const path = request.nextUrl.pathname;
 
   const publicRoutes = [
@@ -49,8 +48,14 @@ export async function updateSession(request: NextRequest) {
     (route) => path === route || path.startsWith("/auth/")
   );
 
+  // --- DEMO MODE ---
+
   if (user && (path === "/" || path === "/auth/login")) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  if (!user && path.startsWith("/dashboard")) {
+    return supabaseResponse;
   }
 
   if (!user && !isPublicRoute) {

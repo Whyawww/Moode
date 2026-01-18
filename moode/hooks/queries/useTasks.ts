@@ -56,7 +56,9 @@ export const useTaskMutations = () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("Unauthorized");
+      if (!user) {
+        throw new Error("DEMO_RESTRICTION");
+      }
       return taskService.addTask(title, user.id);
     },
     onSuccess: () => {
@@ -64,7 +66,9 @@ export const useTaskMutations = () => {
       toast.success("Task added!");
     },
     onError: (err: Error) => {
-      if (err.message && err.message.includes("Focus limit reached")) {
+      if (err.message && err.message.includes("DEMO_RESTRICTION")) {
+        toast.error("Demo mode only allows adding tasks. Please log in.");
+      } else if (err.message && err.message.includes("Focus limit reached")) {
         toast.error(
           "Whoops! Database says you have too many tasks. Finish some first!"
         );
@@ -112,6 +116,12 @@ export const useTaskMutations = () => {
         toast.error("Limit reached! You can't uncheck this task.");
       } else {
         toast.error("Sync failed. Reverting changes.");
+      }
+      
+      if (err.message && err.message.includes("DEMO_RESTRICTION")) {
+        toast.info("Demo Mode: Changes won't be saved.");
+      } else {
+        toast.error("Sync failed.");
       }
     },
 
